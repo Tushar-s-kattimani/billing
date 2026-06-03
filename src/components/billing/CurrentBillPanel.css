@@ -1,0 +1,170 @@
+.bill-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.bill-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--highlight-color);
+}
+
+.bill-title {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--pepsi-blue);
+}
+
+.bill-table-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bill-table th {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 1;
+}
+
+.bill-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+  vertical-align: middle;
+}
+
+.item-name-cell {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.item-qty-cell {
+  color: var(--text-secondary);
+}
+
+.item-amount-cell {
+  font-weight: 600;
+  text-align: right;
+}
+
+.bill-summary {
+  background-color: #F8FAFC;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.summary-row.total-items {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.summary-row.grand-total {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--pepsi-blue);
+}
+
+.payment-options {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.payment-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.payment-methods {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.payment-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: white;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.payment-btn:hover {
+  background: var(--bg-color);
+}
+
+.payment-btn.active {
+  border-color: var(--pepsi-blue);
+  background-color: var(--highlight-color);
+  color: var(--pepsi-blue);
+}
+
+.action-buttons {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.ledger-summary {
+  background-color: var(--bg-color);
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.ledger-row.final {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  font-weight: 700;
+  color: var(--text-primary);
+}

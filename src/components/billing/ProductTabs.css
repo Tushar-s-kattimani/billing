@@ -1,0 +1,36 @@
+.product-tabs-container {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.product-tabs-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tab-btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  background-color: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background-color: var(--highlight-color);
+  color: var(--pepsi-blue);
+  border-color: #93C5FD;
+}
+
+.tab-btn.active {
+  background-color: var(--pepsi-blue);
+  color: white;
+  border-color: var(--pepsi-blue);
+  box-shadow: 0 2px 4px rgba(0, 75, 147, 0.2);
+}

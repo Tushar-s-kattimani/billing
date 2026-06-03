@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import './CurrentBillPanel.css';
+import { Banknote, Smartphone, CreditCard as CardIcon, Building, Save, Printer, PauseCircle, Share2, Trash2 } from 'lucide-react';
+
+const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem }) => {
+  const totalItems = items.length;
+  const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
+  const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
+
+  return (
+    <div className="bill-panel">
+      <div className="bill-header">
+        <h2 className="bill-title">Current Bill</h2>
+      </div>
+
+      <div className="bill-table-container">
+        <table className="bill-table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th style={{textAlign: 'right'}}>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={item.id}>
+                <td className="item-name-cell">{item.name}</td>
+                <td className="item-qty-cell">{item.qty} {item.unit}</td>
+                <td>₹ {item.rate}</td>
+                <td className="item-amount-cell">₹ {item.amount}</td>
+                <td style={{textAlign: 'center', cursor: 'pointer', color: 'var(--pepsi-red)', width: '30px'}} onClick={() => onRemoveItem && onRemoveItem(item.name)}>
+                  <Trash2 size={16} />
+                </td>
+              </tr>
+            ))}
+            {items.length === 0 && (
+              <tr>
+                <td colSpan="5" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>
+                  No items added yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="bill-summary">
+        <div className="summary-row total-items">
+          <span>Total Items: {totalItems}</span>
+          <span>Total Qty: {totalQty} Cases</span>
+        </div>
+        <div className="summary-row grand-total">
+          <span>Grand Total</span>
+          <span>₹ {grandTotal.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div className="action-buttons">
+        <button className="btn btn-secondary btn-full"><Printer size={16} className="mr-2" style={{marginRight: '8px'}} /> Print Bill</button>
+        <button className="btn btn-primary btn-full" onClick={() => onSaveBill(totalItems, totalQty, grandTotal)} disabled={items.length === 0}>
+          <Save size={16} className="mr-2" style={{marginRight: '8px'}} /> Save Bill
+        </button>
+      </div>
+
+    </div>
+  );
+};
+
+export default CurrentBillPanel;
