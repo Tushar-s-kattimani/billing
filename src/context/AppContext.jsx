@@ -41,6 +41,7 @@ const initialProducts = [
 export const AppProvider = ({ children, user }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [isFirebaseError, setIsFirebaseError] = useState(false);
+  const [loadedUserKey, setLoadedUserKey] = useState(null);
 
   const userKey = user ? user.email : 'guest';
   const getStorageKey = (type) => `billing_${type}_${userKey}`;
@@ -63,14 +64,30 @@ export const AppProvider = ({ children, user }) => {
     const fetchFromFirebase = async () => {
       try {
         const prodDoc = await getDoc(doc(db, "users", userKey, "data", "products"));
-        if (prodDoc.exists() && prodDoc.data().items) setProducts(prodDoc.data().items);
+        if (prodDoc.exists() && prodDoc.data().items) {
+          setProducts(prodDoc.data().items);
+        } else {
+          const saved = localStorage.getItem(`billing_products_${userKey}`);
+          setProducts(saved ? JSON.parse(saved) : initialProducts);
+        }
 
         const billDoc = await getDoc(doc(db, "users", userKey, "data", "bills"));
-        if (billDoc.exists() && billDoc.data().items) setBills(billDoc.data().items);
+        if (billDoc.exists() && billDoc.data().items) {
+          setBills(billDoc.data().items);
+        } else {
+          const saved = localStorage.getItem(`billing_history_${userKey}`);
+          setBills(saved ? JSON.parse(saved) : []);
+        }
       } catch (err) {
         console.error("Firebase connection error. Falling back to local storage.", err);
+        alert("Firebase read error: " + err.message);
         setIsFirebaseError(true);
+        const savedProd = localStorage.getItem(`billing_products_${userKey}`);
+        setProducts(savedProd ? JSON.parse(savedProd) : initialProducts);
+        const savedBills = localStorage.getItem(`billing_history_${userKey}`);
+        setBills(savedBills ? JSON.parse(savedBills) : []);
       }
+      setLoadedUserKey(userKey);
       setDataLoaded(true);
     };
 
@@ -80,18 +97,26 @@ export const AppProvider = ({ children, user }) => {
   // Save to Firebase and LocalStorage whenever products change
   useEffect(() => {
     localStorage.setItem(getStorageKey('products'), JSON.stringify(products));
-    if (dataLoaded && !isFirebaseError && user) {
-      setDoc(doc(db, "users", userKey, "data", "products"), { items: products }).catch(console.error);
+    if (dataLoaded && !isFirebaseError && user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", userKey, "data", "products"), { items: products })
+        .catch(err => {
+          console.error(err);
+          alert("Firebase save products error: " + err.message);
+        });
     }
-  }, [products, dataLoaded, isFirebaseError, userKey]);
+  }, [products, dataLoaded, isFirebaseError, userKey, loadedUserKey]);
 
   // Save to Firebase and LocalStorage whenever bills change
   useEffect(() => {
     localStorage.setItem(getStorageKey('history'), JSON.stringify(bills));
-    if (dataLoaded && !isFirebaseError && user) {
-      setDoc(doc(db, "users", userKey, "data", "bills"), { items: bills }).catch(console.error);
+    if (dataLoaded && !isFirebaseError && user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", userKey, "data", "bills"), { items: bills })
+        .catch(err => {
+          console.error(err);
+          alert("Firebase save bills error: " + err.message);
+        });
     }
-  }, [bills, dataLoaded, isFirebaseError, userKey]);
+  }, [bills, dataLoaded, isFirebaseError, userKey, loadedUserKey]);
 
   const addProduct = (newProduct) => setProducts([...products, newProduct]);
   const deleteProduct = (id) => setProducts(products.filter(p => p.id !== id));
