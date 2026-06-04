@@ -48,7 +48,9 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
-  overflow: hidden;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(100vh - 150px);
 }
 
 .data-table {
@@ -68,6 +70,9 @@
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .data-table td {

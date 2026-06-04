@@ -15,11 +15,22 @@ const BillingDashboard = () => {
     if (existingIndex >= 0) {
       const updatedItems = [...billItems];
       updatedItems[existingIndex].qty += item.qty;
-      updatedItems[existingIndex].amount = updatedItems[existingIndex].qty * updatedItems[existingIndex].rate;
+      const currentRate = updatedItems[existingIndex].actualRate !== undefined ? updatedItems[existingIndex].actualRate : updatedItems[existingIndex].rate;
+      updatedItems[existingIndex].amount = updatedItems[existingIndex].qty * currentRate;
       setBillItems(updatedItems);
     } else {
-      setBillItems([...billItems, { ...item, id: Date.now() }]);
+      setBillItems([...billItems, { ...item, actualRate: item.rate, id: Date.now() }]);
     }
+  };
+
+  const handleUpdateItemRate = (name, newRate) => {
+    const updatedItems = billItems.map(item => {
+      if (item.name === name) {
+        return { ...item, actualRate: newRate, amount: item.qty * newRate };
+      }
+      return item;
+    });
+    setBillItems(updatedItems);
   };
 
   const handleSaveBill = (totalItems, totalQty, grandTotal) => {
@@ -53,7 +64,12 @@ const BillingDashboard = () => {
       </div>
       
       <div className="right-column">
-        <CurrentBillPanel items={billItems} onSaveBill={handleSaveBill} onRemoveItem={(name) => setBillItems(billItems.filter(i => i.name !== name))} />
+        <CurrentBillPanel 
+          items={billItems} 
+          onSaveBill={handleSaveBill} 
+          onRemoveItem={(name) => setBillItems(billItems.filter(i => i.name !== name))} 
+          onUpdateItemRate={handleUpdateItemRate}
+        />
       </div>
     </div>
   );

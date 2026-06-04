@@ -312,8 +312,7 @@ const CurrentSavedBills = () => {
                 <div style={{marginTop: '10px', marginBottom: '10px', padding: '4px 0', borderTop: '1px solid #000', borderBottom: '1px solid #000'}}>
                   <p style={{margin: 0, fontWeight: 'bold', fontSize: '1.2em', textTransform: 'uppercase'}}>To: {bill.shopName}</p>
                 </div>
-                <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '5px'}}>
-                  <p>Invoice: {bill.id}</p>
+                <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '5px'}}>
                   <p>Date: {formatDate(bill.date)}</p>
                 </div>
               </div>
@@ -322,6 +321,7 @@ const CurrentSavedBills = () => {
                   <tr>
                     <th>Item</th>
                     <th>Qty</th>
+                    <th>Rate</th>
                     <th style={{textAlign: 'right'}}>Amt</th>
                   </tr>
                 </thead>
@@ -330,6 +330,7 @@ const CurrentSavedBills = () => {
                     <tr key={idx}>
                       <td style={{fontWeight: 'bold'}}>{item.name}</td>
                       <td style={{fontWeight: 'bold'}}>{item.qty} {item.unit}</td>
+                      <td style={{fontWeight: 'bold'}}>₹ {item.actualRate !== undefined ? item.actualRate : item.rate}</td>
                       <td style={{textAlign: 'right', fontWeight: 'bold'}}>₹ {item.amount}</td>
                     </tr>
                   ))}

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import './Products.css';
-import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const Products = () => {
-  const { products, addProduct, deleteProduct, editProduct } = useAppContext();
+  const { products, addProduct, deleteProduct, editProduct, moveProduct } = useAppContext();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -120,6 +120,16 @@ const Products = () => {
                 <td>₹ {product.variants.length > 0 ? product.variants[0].rate : 0}.00 (Starts at)</td>
                 <td>
                   <div className="action-cell">
+                    {searchTerm === '' && (
+                      <>
+                        <button className="icon-btn" title="Move Up" onClick={() => moveProduct(product.id, 'up')}>
+                          <ArrowUp size={16} />
+                        </button>
+                        <button className="icon-btn" title="Move Down" onClick={() => moveProduct(product.id, 'down')}>
+                          <ArrowDown size={16} />
+                        </button>
+                      </>
+                    )}
                     <button className="icon-btn" title="Edit" onClick={() => handleEditClick(product)}>
                       <Edit2 size={16} />
                     </button>

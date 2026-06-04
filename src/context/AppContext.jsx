@@ -96,6 +96,20 @@ export const AppProvider = ({ children, user }) => {
   const addProduct = (newProduct) => setProducts([...products, newProduct]);
   const deleteProduct = (id) => setProducts(products.filter(p => p.id !== id));
   const editProduct = (id, updatedProduct) => setProducts(products.map(p => p.id === id ? { ...updatedProduct, id } : p));
+  const moveProduct = (id, direction) => {
+    const index = products.findIndex(p => p.id === id);
+    if (index === -1) return;
+    
+    if (direction === 'up' && index > 0) {
+      const newProducts = [...products];
+      [newProducts[index - 1], newProducts[index]] = [newProducts[index], newProducts[index - 1]];
+      setProducts(newProducts);
+    } else if (direction === 'down' && index < products.length - 1) {
+      const newProducts = [...products];
+      [newProducts[index], newProducts[index + 1]] = [newProducts[index + 1], newProducts[index]];
+      setProducts(newProducts);
+    }
+  };
 
   const addBill = (newBill) => setBills([newBill, ...bills]); // Add newest to the top
   const updateBillStatus = (id, isPrinted) => setBills(bills.map(b => b.id === id ? { ...b, isPrinted } : b));
@@ -105,7 +119,7 @@ export const AppProvider = ({ children, user }) => {
 
   return (
     <AppContext.Provider value={{ 
-      products, addProduct, deleteProduct, editProduct, 
+      products, addProduct, deleteProduct, editProduct, moveProduct,
       bills, addBill, updateBillStatus, clearBill, clearAllBills, deleteBill 
     }}>
       {children}

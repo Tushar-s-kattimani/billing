@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './CurrentBillPanel.css';
 import { Banknote, Smartphone, CreditCard as CardIcon, Building, Save, Printer, PauseCircle, Share2, Trash2 } from 'lucide-react';
 
-const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem }) => {
+const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate }) => {
   const totalItems = items.length;
   const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
   const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
@@ -20,6 +20,7 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem }) => {
               <th>Item Name</th>
               <th>Qty</th>
               <th>Rate</th>
+              <th>Actual Rate</th>
               <th style={{textAlign: 'right'}}>Amount</th>
               <th></th>
             </tr>
@@ -30,6 +31,17 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem }) => {
                 <td className="item-name-cell">{item.name}</td>
                 <td className="item-qty-cell">{item.qty} {item.unit}</td>
                 <td>₹ {item.rate}</td>
+                <td>
+                  <div style={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap'}}>
+                    <input 
+                      type="number" 
+                      value={item.actualRate !== undefined ? item.actualRate : item.rate} 
+                      onChange={(e) => onUpdateItemRate && onUpdateItemRate(item.name, Number(e.target.value))}
+                      style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)'}}
+                    />
+                    <span style={{marginLeft: '4px'}}>₹</span>
+                  </div>
+                </td>
                 <td className="item-amount-cell">₹ {item.amount}</td>
                 <td style={{textAlign: 'center', cursor: 'pointer', color: 'var(--pepsi-red)', width: '30px'}} onClick={() => onRemoveItem && onRemoveItem(item.name)}>
                   <Trash2 size={16} />
@@ -38,7 +50,7 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem }) => {
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan="5" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>
+                <td colSpan="6" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>
                   No items added yet.
                 </td>
               </tr>
