@@ -180,3 +180,84 @@ body {
   border: 1px solid var(--border-color);
   padding: 1.5rem;
 }
+
+/* Print Styles */
+@media print {
+  /* Reset layout constraints to allow multi-page printing */
+  @page {
+    margin: 1cm;
+  }
+  
+  html, body, #root, .app-container, .main-content-area, .dashboard-container {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: white !important;
+  }
+
+  /* Hide sidebar and navigation */
+  .sidebar, .header-container, .left-column {
+    display: none !important;
+  }
+
+  /* Make the bill panel take full width and height for printing */
+  .right-column {
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .bill-panel {
+    display: block !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure the table can expand to show all products */
+  .bill-table-container {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    flex: none !important;
+  }
+  
+  .bill-table {
+    page-break-inside: auto;
+  }
+  
+  .bill-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  .bill-table thead {
+    display: table-header-group;
+  }
+
+  /* Hide buttons */
+  .action-buttons, .payment-options, .bill-header h2.bill-title {
+    display: none !important;
+  }
+
+  /* History page print styling */
+  .history-page {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .history-table-container {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .history-header .history-actions, .history-table th:last-child, .history-table td:last-child {
+    display: none !important;
+  }
+}
+

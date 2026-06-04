@@ -6,9 +6,13 @@ import CurrentBillPanel from './CurrentBillPanel';
 import { useAppContext } from '../../context/AppContext';
 
 const BillingDashboard = () => {
-  const [billItems, setBillItems] = useState([]);
-  const [shopName, setShopName] = useState('');
-  const { addBill } = useAppContext();
+  const { 
+    addBill, 
+    currentBillItems: billItems, 
+    setCurrentBillItems: setBillItems,
+    currentShopName: shopName,
+    setCurrentShopName: setShopName
+  } = useAppContext();
 
   const handleAddToBill = (item) => {
     const existingIndex = billItems.findIndex(i => i.name === item.name);

@@ -71,7 +71,7 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate })
       </div>
 
       <div className="action-buttons">
-        <button className="btn btn-secondary btn-full"><Printer size={16} className="mr-2" style={{marginRight: '8px'}} /> Print Bill</button>
+        <button className="btn btn-secondary btn-full" onClick={() => window.print()}><Printer size={16} className="mr-2" style={{marginRight: '8px'}} /> Print Bill</button>
         <button className="btn btn-primary btn-full" onClick={() => onSaveBill(totalItems, totalQty, grandTotal)} disabled={items.length === 0}>
           <Save size={16} className="mr-2" style={{marginRight: '8px'}} /> Save Bill
         </button>

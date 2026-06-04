@@ -58,6 +58,23 @@ export const AppProvider = ({ children, user }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [currentBillItems, setCurrentBillItems] = useState(() => {
+    const saved = localStorage.getItem(getStorageKey('currentBillItems'));
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [currentShopName, setCurrentShopName] = useState(() => {
+    return localStorage.getItem(getStorageKey('currentShopName')) || '';
+  });
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey('currentBillItems'), JSON.stringify(currentBillItems));
+  }, [currentBillItems, userKey]);
+
+  useEffect(() => {
+    localStorage.setItem(getStorageKey('currentShopName'), currentShopName);
+  }, [currentShopName, userKey]);
+
   // Fetch true state from Firebase on mount or when user changes
   useEffect(() => {
     if (!user) return;
@@ -146,7 +163,9 @@ export const AppProvider = ({ children, user }) => {
   return (
     <AppContext.Provider value={{ 
       products, addProduct, deleteProduct, editProduct, moveProduct,
-      bills, addBill, updateBillStatus, clearBill, clearAllBills, deleteBill 
+      bills, addBill, updateBillStatus, clearBill, clearAllBills, deleteBill,
+      currentBillItems, setCurrentBillItems,
+      currentShopName, setCurrentShopName
     }}>
       {children}
     </AppContext.Provider>

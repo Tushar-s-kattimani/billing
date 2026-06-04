@@ -26,9 +26,11 @@ const BillHistory = () => {
   );
 
   const handlePrint = (id) => {
-    // In a real app, this would trigger window.print() and format a print layout
-    // For now, we just update the status to mark it as printed
     updateBillStatus(id, true);
+    setExpandedRow(id);
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   const formatDate = (dateString) => {

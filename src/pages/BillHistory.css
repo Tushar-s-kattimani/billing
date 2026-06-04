@@ -260,27 +260,24 @@
 
   /* Scale down fonts and set heights to force exact items per page */
   .print-layout-1 .print-receipt { min-height: 277mm; }
-  .print-layout-2 .print-receipt { height: 133mm; overflow: hidden; }
+  .print-layout-2 .print-receipt { min-height: 133mm; }
 
   .print-layout-4 .print-receipt {
     font-size: 10pt;
     padding: 4mm;
-    height: 133mm;
-    overflow: hidden;
+    min-height: 133mm;
   }
 
   .print-layout-6 .print-receipt {
     font-size: 8pt;
     padding: 3mm;
-    height: 85mm;
-    overflow: hidden;
+    min-height: 85mm;
   }
 
   .print-layout-9 .print-receipt {
     font-size: 7pt;
     padding: 2mm;
-    height: 85mm;
-    overflow: hidden;
+    min-height: 85mm;
   }
 
   .print-layout-6 .print-header,
