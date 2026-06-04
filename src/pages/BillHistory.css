@@ -254,28 +254,28 @@
     page-break-inside: avoid;
     break-inside: avoid;
     font-family: monospace;
-    font-size: 14pt;
+    font-size: 16pt;
     font-weight: bold;
   }
 
   /* Scale down fonts and set heights to force exact items per page */
-  .print-layout-1 .print-receipt { min-height: 277mm; }
-  .print-layout-2 .print-receipt { min-height: 133mm; }
+  .print-layout-1 .print-receipt { min-height: 277mm; font-size: 16pt; }
+  .print-layout-2 .print-receipt { min-height: 133mm; font-size: 14pt; }
 
   .print-layout-4 .print-receipt {
-    font-size: 10pt;
+    font-size: 12pt;
     padding: 4mm;
     min-height: 133mm;
   }
 
   .print-layout-6 .print-receipt {
-    font-size: 8pt;
+    font-size: 10pt;
     padding: 3mm;
     min-height: 85mm;
   }
 
   .print-layout-9 .print-receipt {
-    font-size: 7pt;
+    font-size: 8.5pt;
     padding: 2mm;
     min-height: 85mm;
   }

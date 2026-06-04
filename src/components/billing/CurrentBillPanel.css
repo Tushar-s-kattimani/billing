@@ -33,8 +33,8 @@
   background-color: white;
   padding: 0.75rem 1.5rem;
   text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   border-bottom: 1px solid var(--border-color);
@@ -44,17 +44,19 @@
 .bill-table td {
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  font-size: 0.875rem;
+  font-size: 1rem;
   vertical-align: middle;
 }
 
 .item-name-cell {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.05rem;
   color: var(--text-primary);
 }
 
 .item-qty-cell {
   color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .item-amount-cell {
@@ -72,7 +74,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--text-secondary);
 }
 
