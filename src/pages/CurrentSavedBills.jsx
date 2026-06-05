@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './BillHistory.css'; // Reusing the same styles
-import { Search, CheckCircle2, Trash2, Printer } from 'lucide-react';
+import { Search, CheckCircle2, Trash2, Printer, Edit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const CurrentSavedBills = () => {
-  const { bills, clearBill, clearAllBills, updateBillStatus } = useAppContext();
+  const navigate = useNavigate();
+  const { bills, clearBill, clearAllBills, updateBillStatus, deleteBill, setCurrentBillItems, setCurrentShopName } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [billsPerPage, setBillsPerPage] = useState(4);
   const [showLoadSheet, setShowLoadSheet] = useState(false);
@@ -21,6 +23,15 @@ const CurrentSavedBills = () => {
   const handleClearAll = () => {
     if (window.confirm("Are you sure you want to clear all current bills? They will still be available in the Bill History.")) {
       clearAllBills();
+    }
+  };
+
+  const handleEdit = (bill) => {
+    if (window.confirm("This will move the bill back to the billing screen for editing. Continue?")) {
+      setCurrentBillItems(bill.items);
+      setCurrentShopName(bill.shopName);
+      deleteBill(bill.id);
+      navigate('/');
     }
   };
 
@@ -135,6 +146,15 @@ const CurrentSavedBills = () => {
                   <span className={`status-badge ${bill.isPrinted ? 'printed' : 'unprinted'}`}>
                     {bill.isPrinted ? 'Printed' : 'Unprinted'}
                   </span>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => handleEdit(bill)}
+                    title="Edit this bill in the billing dashboard"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', marginRight: '0.5rem' }}
+                  >
+                    <Edit size={16} />
+                    Edit
+                  </button>
                   <button 
                     className="btn btn-primary"
                     onClick={() => handleClear(bill.id)}

@@ -96,6 +96,17 @@ export const AppProvider = ({ children, user }) => {
           const saved = localStorage.getItem(`billing_history_${userKey}`);
           setBills(saved ? JSON.parse(saved) : []);
         }
+
+        const draftDoc = await getDoc(doc(db, "users", firebaseUserKey, "data", "draft"));
+        if (draftDoc.exists()) {
+          const data = draftDoc.data();
+          if (data.currentBillItems) {
+            setCurrentBillItems(data.currentBillItems);
+          }
+          if (data.currentShopName !== undefined) {
+            setCurrentShopName(data.currentShopName);
+          }
+        }
       } catch (err) {
         console.error("Firebase connection error. Falling back to local storage.", err);
         alert("Firebase read error: " + err.message);
@@ -104,6 +115,8 @@ export const AppProvider = ({ children, user }) => {
         setProducts(savedProd ? JSON.parse(savedProd) : initialProducts);
         const savedBills = localStorage.getItem(`billing_history_${userKey}`);
         setBills(savedBills ? JSON.parse(savedBills) : []);
+        const savedDraft = localStorage.getItem(`billing_currentBillItems_${userKey}`);
+        if (savedDraft) setCurrentBillItems(JSON.parse(savedDraft));
       }
       setLoadedUserKey(userKey);
       setDataLoaded(true);
@@ -135,6 +148,19 @@ export const AppProvider = ({ children, user }) => {
         });
     }
   }, [bills, dataLoaded, isFirebaseError, userKey, loadedUserKey, firebaseUserKey]);
+
+  // Save to Firebase whenever currentBillItems or currentShopName changes
+  useEffect(() => {
+    if (dataLoaded && !isFirebaseError && user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", firebaseUserKey, "data", "draft"), { 
+        currentBillItems,
+        currentShopName
+      }, { merge: true })
+        .catch(err => {
+          console.error("Firebase save draft error: ", err);
+        });
+    }
+  }, [currentBillItems, currentShopName, dataLoaded, isFirebaseError, userKey, loadedUserKey, firebaseUserKey]);
 
   const addProduct = (newProduct) => setProducts([...products, newProduct]);
   const deleteProduct = (id) => setProducts(products.filter(p => p.id !== id));
