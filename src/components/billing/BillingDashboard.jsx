@@ -37,6 +37,21 @@ const BillingDashboard = () => {
     setBillItems(updatedItems);
   };
 
+  const handleUpdateItemQty = (name, rawQty) => {
+    const newQty = rawQty === '' ? '' : Number(rawQty);
+    if (newQty !== '' && newQty < 0) return;
+
+    const updatedItems = billItems.map(item => {
+      if (item.name === name) {
+        const currentRate = item.actualRate !== undefined ? item.actualRate : item.rate;
+        const qtyNum = newQty === '' ? 0 : newQty;
+        return { ...item, qty: newQty, amount: qtyNum * currentRate };
+      }
+      return item;
+    });
+    setBillItems(updatedItems);
+  };
+
   const handleSaveBill = (totalItems, totalQty, grandTotal) => {
     if (billItems.length === 0) return;
     
@@ -73,6 +88,7 @@ const BillingDashboard = () => {
           onSaveBill={handleSaveBill} 
           onRemoveItem={(name) => setBillItems(billItems.filter(i => i.name !== name))} 
           onUpdateItemRate={handleUpdateItemRate}
+          onUpdateItemQty={handleUpdateItemQty}
         />
       </div>
     </div>

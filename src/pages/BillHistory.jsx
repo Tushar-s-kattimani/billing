@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import './BillHistory.css';
-import { Search, Printer, CheckCircle, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { Search, Printer, CheckCircle, ChevronDown, ChevronUp, Trash2, Edit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const BillHistory = () => {
-  const { bills, updateBillStatus, deleteBill } = useAppContext();
+  const { bills, updateBillStatus, deleteBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
 
@@ -17,6 +19,18 @@ const BillHistory = () => {
     if (window.confirm("Are you sure you want to permanently delete this bill from history?")) {
       deleteBill(id);
     }
+  };
+
+  const handleEdit = (bill) => {
+    if (currentBillItems.length > 0) {
+      if (!window.confirm("Editing this bill will overwrite your current unsaved draft. Continue?")) {
+        return;
+      }
+    }
+    setCurrentBillItems(bill.items);
+    setCurrentShopName(bill.shopName || '');
+    deleteBill(bill.id);
+    navigate('/');
   };
 
   // Filter bills based on search term
@@ -92,6 +106,15 @@ const BillHistory = () => {
                       >
                         {expandedRow === bill.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         Details
+                      </button>
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={() => handleEdit(bill)}
+                        title="Edit Bill"
+                        style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem', backgroundColor: 'transparent', border: '1px solid var(--border-color)', color: 'var(--primary-color)' }}
+                      >
+                        <Edit size={16} />
+                        Edit
                       </button>
                       <button 
                         className={`print-btn ${bill.isPrinted ? 'printed-state' : ''}`}

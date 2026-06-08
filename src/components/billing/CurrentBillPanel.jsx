@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './CurrentBillPanel.css';
 import { Banknote, Smartphone, CreditCard as CardIcon, Building, Save, Printer, PauseCircle, Share2, Trash2 } from 'lucide-react';
 
-const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate }) => {
+const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate, onUpdateItemQty }) => {
   const totalItems = items.length;
   const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
   const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
@@ -29,7 +29,18 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate })
             {items.map(item => (
               <tr key={item.id}>
                 <td className="item-name-cell">{item.name}</td>
-                <td className="item-qty-cell">{item.qty} {item.unit}</td>
+                <td className="item-qty-cell">
+                  <div style={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap'}}>
+                    <input 
+                      type="number" 
+                      min="1"
+                      value={item.qty === 0 && item.qty !== '' ? '' : item.qty} 
+                      onChange={(e) => onUpdateItemQty && onUpdateItemQty(item.name, e.target.value)}
+                      style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)'}}
+                    />
+                    <span style={{marginLeft: '4px'}}>{item.unit}</span>
+                  </div>
+                </td>
                 <td>₹ {item.rate}</td>
                 <td>
                   <div style={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap'}}>
