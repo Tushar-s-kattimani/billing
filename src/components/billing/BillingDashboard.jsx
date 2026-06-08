@@ -27,10 +27,15 @@ const BillingDashboard = () => {
     }
   };
 
-  const handleUpdateItemRate = (name, newRate) => {
+  const handleUpdateItemRate = (name, rawRate) => {
+    const newRate = rawRate === '' ? '' : Number(rawRate);
+    if (newRate !== '' && newRate < 0) return;
+
     const updatedItems = billItems.map(item => {
       if (item.name === name) {
-        return { ...item, actualRate: newRate, amount: item.qty * newRate };
+        const rateNum = newRate === '' ? 0 : newRate;
+        const qtyNum = item.qty === '' ? 0 : item.qty;
+        return { ...item, actualRate: newRate, amount: qtyNum * rateNum };
       }
       return item;
     });

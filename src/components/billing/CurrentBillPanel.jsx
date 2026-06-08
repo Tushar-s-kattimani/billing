@@ -20,7 +20,6 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate, o
               <th>Item Name</th>
               <th>Qty</th>
               <th>Rate</th>
-              <th>Actual Rate</th>
               <th style={{textAlign: 'right'}}>Amount</th>
               <th></th>
             </tr>
@@ -32,25 +31,33 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate, o
                 <td className="item-qty-cell">
                   <div style={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap'}}>
                     <input 
+                      className="print-hidden"
                       type="number" 
                       min="1"
                       value={item.qty === 0 && item.qty !== '' ? '' : item.qty} 
                       onChange={(e) => onUpdateItemQty && onUpdateItemQty(item.name, e.target.value)}
                       style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)'}}
                     />
+                    <span className="print-only" style={{fontWeight: 'bold', marginRight: '4px'}}>
+                      {item.qty}
+                    </span>
                     <span style={{marginLeft: '4px'}}>{item.unit}</span>
                   </div>
                 </td>
-                <td>₹ {item.rate}</td>
                 <td>
                   <div style={{display: 'flex', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap'}}>
+                    <span style={{marginRight: '4px'}}>₹</span>
                     <input 
+                      className="print-hidden"
                       type="number" 
-                      value={item.actualRate !== undefined ? item.actualRate : item.rate} 
-                      onChange={(e) => onUpdateItemRate && onUpdateItemRate(item.name, Number(e.target.value))}
-                      style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)'}}
+                      min="0"
+                      value={item.actualRate !== undefined ? (item.actualRate === 0 && item.actualRate !== '' ? '' : item.actualRate) : item.rate} 
+                      onChange={(e) => onUpdateItemRate && onUpdateItemRate(item.name, e.target.value)}
+                      style={{width: '70px', padding: '4px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)'}}
                     />
-                    <span style={{marginLeft: '4px'}}>₹</span>
+                    <span className="print-only" style={{fontWeight: 'bold'}}>
+                      {item.actualRate !== undefined ? item.actualRate : item.rate}
+                    </span>
                   </div>
                 </td>
                 <td className="item-amount-cell">₹ {item.amount}</td>

@@ -64,6 +64,11 @@ const ProductCard = ({ product, onAddToBill }) => {
             onBlur={() => {
               if (quantity === '' || quantity < 1) setQuantity(1);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleAdd();
+              }
+            }}
           />
           <button className="qty-btn" onClick={() => handleQtyChange(1)}><Plus size={14}/></button>
         </div>

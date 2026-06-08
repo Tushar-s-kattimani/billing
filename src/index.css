@@ -181,6 +181,10 @@ body {
   padding: 1.5rem;
 }
 
+.print-only {
+  display: none;
+}
+
 /* Print Styles */
 @media print {
   /* Reset layout constraints to allow multi-page printing */
@@ -258,6 +262,14 @@ body {
   }
   .history-header .history-actions, .history-table th:last-child, .history-table td:last-child {
     display: none !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: inline !important;
   }
 }
 

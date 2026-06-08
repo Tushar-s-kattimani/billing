@@ -155,7 +155,7 @@ const BillHistory = () => {
                               <tr key={idx}>
                                 <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)', fontWeight: '500' }}>{item.name}</td>
                                 <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)' }}>{item.qty} {item.unit}</td>
-                                <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)' }}>₹ {item.rate}</td>
+                                <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)' }}>₹ {item.actualRate !== undefined ? item.actualRate : item.rate}</td>
                                 <td style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border-color)', textAlign: 'right', fontWeight: '500' }}>₹ {item.amount}</td>
                               </tr>
                             ))}

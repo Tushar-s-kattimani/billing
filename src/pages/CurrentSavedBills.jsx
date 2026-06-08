@@ -182,7 +182,7 @@ const CurrentSavedBills = () => {
                       <tr key={idx}>
                         <td style={{fontWeight: 'bold'}}>{item.name}</td>
                         <td style={{fontWeight: 'bold'}}>{item.qty} {item.unit}</td>
-                        <td style={{fontWeight: 'bold'}}>₹ {item.rate}</td>
+                        <td style={{fontWeight: 'bold'}}>₹ {item.actualRate !== undefined ? item.actualRate : item.rate}</td>
                         <td style={{textAlign: 'right', fontWeight: 'bold'}}>₹ {item.amount}</td>
                       </tr>
                     ))}
