@@ -220,20 +220,26 @@
 }
 
 @media print {
-  /* Hide EVERYTHING except the print container */
-  body * {
-    visibility: hidden;
+  /* Hide the regular page UI completely from flow so it doesn't create blank pages */
+  .history-header,
+  .history-table-container,
+  .bills-list,
+  .modal-overlay,
+  .empty-state {
+    display: none !important;
   }
 
-  .print-container, .print-container * {
-    visibility: visible;
+  /* Make sure history page itself doesn't restrict height or add padding */
+  .history-page {
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
   }
 
   .print-container {
-    display: grid;
-    position: absolute;
-    left: 0;
-    top: 0;
+    display: grid !important;
+    position: relative !important;
     width: 100%;
     /* A4 roughly fits these gaps nicely */
     gap: 10mm;
@@ -257,31 +263,37 @@
     /* Avoid breaking a receipt across pages */
     page-break-inside: avoid;
     break-inside: avoid;
-    font-family: monospace;
+    font-family: "Bookman Old Style", Bookman, serif !important;
     font-size: 16pt;
-    font-weight: bold;
+    font-weight: bold !important;
+    color: black !important;
   }
 
-  /* Scale down fonts and set heights to force exact items per page */
-  .print-layout-1 .print-receipt { min-height: 277mm; font-size: 16pt; }
-  .print-layout-2 .print-receipt { min-height: 133mm; font-size: 14pt; }
+  .print-receipt * {
+    font-weight: bold !important;
+    color: black !important;
+  }
+
+  /* Scale down fonts and allow heights to set automatically based on content */
+  .print-layout-1 .print-receipt { height: auto; font-size: 16pt; }
+  .print-layout-2 .print-receipt { height: auto; font-size: 14pt; }
 
   .print-layout-4 .print-receipt {
     font-size: 12pt;
     padding: 4mm;
-    min-height: 133mm;
+    height: auto;
   }
 
   .print-layout-6 .print-receipt {
     font-size: 10pt;
     padding: 3mm;
-    min-height: 85mm;
+    height: auto;
   }
 
   .print-layout-9 .print-receipt {
     font-size: 8.5pt;
     padding: 2mm;
-    min-height: 85mm;
+    height: auto;
   }
 
   .print-layout-6 .print-header,

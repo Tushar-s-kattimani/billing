@@ -203,7 +203,7 @@ body {
   }
 
   /* Hide sidebar and navigation */
-  .sidebar, .header-container, .left-column {
+  .sidebar, .header, .left-column {
     display: none !important;
   }
 
@@ -244,6 +244,11 @@ body {
   
   .bill-table thead {
     display: table-header-group;
+  }
+
+  .bill-table th, .bill-table td, .summary-row, .summary-row span, .print-only {
+    font-weight: bold !important;
+    color: black !important;
   }
 
   /* Hide buttons */

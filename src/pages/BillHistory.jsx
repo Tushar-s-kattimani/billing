@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import './BillHistory.css';
-import { Search, Printer, CheckCircle, ChevronDown, ChevronUp, Trash2, Edit } from 'lucide-react';
+import { Search, ListPlus, CheckCircle, ChevronDown, ChevronUp, Trash2, Edit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
 const BillHistory = () => {
-  const { bills, updateBillStatus, deleteBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
+  const { bills, unclearBill, deleteBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
@@ -39,12 +39,9 @@ const BillHistory = () => {
     (b.shopName && b.shopName.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handlePrint = (id) => {
-    updateBillStatus(id, true);
-    setExpandedRow(id);
-    setTimeout(() => {
-      window.print();
-    }, 100);
+  const handlePushToCurrent = (id) => {
+    unclearBill(id);
+    alert("Bill pushed back to Current Saved Bills (Daily Queue)!");
   };
 
   const formatDate = (dateString) => {
@@ -117,12 +114,13 @@ const BillHistory = () => {
                         Edit
                       </button>
                       <button 
-                        className={`print-btn ${bill.isPrinted ? 'printed-state' : ''}`}
-                        onClick={() => handlePrint(bill.id)}
-                        style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                        className="btn btn-secondary"
+                        onClick={() => handlePushToCurrent(bill.id)}
+                        title="Push to Current Queue"
+                        style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem', backgroundColor: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
                       >
-                        {bill.isPrinted ? <CheckCircle size={16} /> : <Printer size={16} />}
-                        Print
+                        <ListPlus size={16} />
+                        To Queue
                       </button>
                       <button 
                         className="btn btn-secondary"

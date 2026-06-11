@@ -183,13 +183,14 @@ export const AppProvider = ({ children, user }) => {
   const addBill = (newBill) => setBills([newBill, ...bills]); // Add newest to the top
   const updateBillStatus = (id, isPrinted) => setBills(bills.map(b => b.id === id ? { ...b, isPrinted } : b));
   const clearBill = (id) => setBills(bills.map(b => b.id === id ? { ...b, isCleared: true } : b));
+  const unclearBill = (id) => setBills(bills.map(b => b.id === id ? { ...b, isCleared: false } : b));
   const clearAllBills = () => setBills(bills.map(b => ({ ...b, isCleared: true })));
   const deleteBill = (id) => setBills(bills.filter(b => b.id !== id));
 
   return (
     <AppContext.Provider value={{ 
       products, addProduct, deleteProduct, editProduct, moveProduct,
-      bills, addBill, updateBillStatus, clearBill, clearAllBills, deleteBill,
+      bills, addBill, updateBillStatus, clearBill, unclearBill, clearAllBills, deleteBill,
       currentBillItems, setCurrentBillItems,
       currentShopName, setCurrentShopName
     }}>
