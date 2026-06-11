@@ -17,28 +17,28 @@ const BillHistory = () => {
     const doc = new jsPDF();
     
     // Header
-    doc.setFontSize(18);
+    doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
     doc.text("SHRI GAJANAN ENTERPRISES GHATAPRABHA", 14, 20);
     
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text("GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040", 14, 26);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text("GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040", 14, 28);
     
     doc.setLineWidth(0.5);
-    doc.line(14, 30, 196, 30);
+    doc.line(14, 32, 196, 32);
+    
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`To: ${bill.shopName}`, 14, 40);
     
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(`To: ${bill.shopName}`, 14, 38);
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Invoice ID: ${bill.id}`, 14, 44);
+    doc.text(`Invoice ID: ${bill.id}`, 14, 48);
     
     const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     const dateStr = new Date(bill.date).toLocaleDateString('en-IN', options);
-    doc.text(`Date: ${dateStr}`, 14, 49);
+    doc.text(`Date: ${dateStr}`, 14, 54);
     
     // Table
     const tableData = bill.items.map((item, idx) => [
@@ -50,12 +50,12 @@ const BillHistory = () => {
     ]);
     
     autoTable(doc, {
-      startY: 55,
+      startY: 60,
       head: [['S.No', 'Item Name', 'Quantity', 'Rate', 'Total Amount']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [0, 91, 170], halign: 'center' },
-      styles: { fontSize: 10, cellPadding: 4, lineColor: [200, 200, 200], lineWidth: 0.1 },
+      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], halign: 'center', fontStyle: 'bold', fontSize: 12 },
+      styles: { textColor: [0, 0, 0], fontSize: 11, fontStyle: 'bold', cellPadding: 5, lineColor: [150, 150, 150], lineWidth: 0.2 },
       columnStyles: {
         0: { cellWidth: 15, halign: 'center' },
         1: { cellWidth: 'auto' },
@@ -66,12 +66,13 @@ const BillHistory = () => {
     });
     
     // Totals
-    const finalY = doc.lastAutoTable.finalY + 10;
+    const finalY = doc.lastAutoTable.finalY + 12;
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text(`Total Items: ${bill.totalItems} (${bill.totalQty} Cases)`, 14, finalY);
     
-    doc.setFontSize(12);
-    doc.text(`Grand Total: Rs. ${bill.grandTotal.toFixed(2)}`, 140, finalY);
+    doc.setFontSize(16);
+    doc.text(`Grand Total: Rs. ${bill.grandTotal.toFixed(2)}`, 130, finalY);
     
     doc.save(`Invoice_${bill.id}.pdf`);
   };
@@ -123,12 +124,12 @@ const BillHistory = () => {
     
     const doc = new jsPDF();
     
-    doc.setFontSize(18);
+    doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
     doc.text("Detailed Saved Bills Report", 14, 20);
     
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
     if (dateFilter) {
       doc.text(`Date: ${dateFilter}`, 14, 28);
     } else {
@@ -186,8 +187,8 @@ const BillHistory = () => {
       head: [['S.No', 'Inv ID', 'Shop Name', 'Item Name', 'Qty', 'Rate', 'Amount']],
       body: tableData,
       theme: 'grid',
-      headStyles: { fillColor: [0, 91, 170], halign: 'center' },
-      styles: { fontSize: 8, cellPadding: 3, lineColor: [200, 200, 200], lineWidth: 0.1 },
+      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], halign: 'center', fontStyle: 'bold', fontSize: 11 },
+      styles: { textColor: [0, 0, 0], fontSize: 10, fontStyle: 'bold', cellPadding: 4, lineColor: [150, 150, 150], lineWidth: 0.2 },
       columnStyles: {
         0: { cellWidth: 12, halign: 'center' },
         1: { cellWidth: 20, halign: 'center' },
@@ -207,8 +208,8 @@ const BillHistory = () => {
     }
     const totalSum = filteredBills.reduce((sum, b) => sum + b.grandTotal, 0);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(0, 91, 170); // Pepsi blue
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0); // Black color
     doc.text(`GRAND TOTAL FOR REPORT: Rs. ${totalSum.toFixed(2)}`, 14, currentY);
     
     doc.save(dateFilter ? `Detailed_Bills_Report_${dateFilter}.pdf` : `Detailed_Bills_Report_All.pdf`);
