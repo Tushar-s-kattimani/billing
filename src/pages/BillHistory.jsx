@@ -1,14 +1,80 @@
 import React, { useState } from 'react';
 import './BillHistory.css';
-import { Search, ListPlus, CheckCircle, ChevronDown, ChevronUp, Trash2, Edit } from 'lucide-react';
+import { Search, ListPlus, CheckCircle, ChevronDown, ChevronUp, Trash2, Edit, Printer, Download } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const BillHistory = () => {
   const { bills, unclearBill, deleteBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
   const [expandedRow, setExpandedRow] = useState(null);
+
+  const handleDownloadSinglePDF = (bill) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text("SHRI GAJANAN ENTERPRISES GHATAPRABHA", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text("GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040", 14, 26);
+    
+    doc.setLineWidth(0.5);
+    doc.line(14, 30, 196, 30);
+    
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`To: ${bill.shopName}`, 14, 38);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Invoice ID: ${bill.id}`, 14, 44);
+    
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const dateStr = new Date(bill.date).toLocaleDateString('en-IN', options);
+    doc.text(`Date: ${dateStr}`, 14, 49);
+    
+    // Table
+    const tableData = bill.items.map((item, idx) => [
+      idx + 1,
+      item.name,
+      `${item.qty} ${item.unit}`,
+      `Rs. ${item.actualRate !== undefined ? item.actualRate : item.rate}`,
+      `Rs. ${item.amount}`
+    ]);
+    
+    autoTable(doc, {
+      startY: 55,
+      head: [['S.No', 'Item Name', 'Quantity', 'Rate', 'Total Amount']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 91, 170], halign: 'center' },
+      styles: { fontSize: 10, cellPadding: 4, lineColor: [200, 200, 200], lineWidth: 0.1 },
+      columnStyles: {
+        0: { cellWidth: 15, halign: 'center' },
+        1: { cellWidth: 'auto' },
+        2: { cellWidth: 30, halign: 'center' },
+        3: { cellWidth: 30, halign: 'right' },
+        4: { cellWidth: 35, halign: 'right' },
+      }
+    });
+    
+    // Totals
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total Items: ${bill.totalItems} (${bill.totalQty} Cases)`, 14, finalY);
+    
+    doc.setFontSize(12);
+    doc.text(`Grand Total: Rs. ${bill.grandTotal.toFixed(2)}`, 140, finalY);
+    
+    doc.save(`Invoice_${bill.id}.pdf`);
+  };
 
   const toggleRow = (id) => {
     if (expandedRow === id) setExpandedRow(null);
@@ -33,11 +99,120 @@ const BillHistory = () => {
     navigate('/');
   };
 
-  // Filter bills based on search term
-  const filteredBills = bills.filter(b => 
-    b.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (b.shopName && b.shopName.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  // Filter bills based on search term and date
+  const filteredBills = bills.filter(b => {
+    const matchesSearch = b.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (b.shopName && b.shopName.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    let matchesDate = true;
+    if (dateFilter) {
+      const billDateObj = new Date(b.date);
+      // Format as YYYY-MM-DD in local time
+      const year = billDateObj.getFullYear();
+      const month = String(billDateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(billDateObj.getDate()).padStart(2, '0');
+      const billDate = `${year}-${month}-${day}`;
+      matchesDate = billDate === dateFilter;
+    }
+    
+    return matchesSearch && matchesDate;
+  });
+
+  const handleBatchDownloadPDF = () => {
+    if (filteredBills.length === 0) return;
+    
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text("Detailed Saved Bills Report", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    if (dateFilter) {
+      doc.text(`Date: ${dateFilter}`, 14, 28);
+    } else {
+      doc.text(`Showing All History`, 14, 28);
+    }
+
+    doc.setLineWidth(0.5);
+    doc.line(14, 32, 196, 32);
+    
+    // Build a single massive master table with grouped bills
+    const tableData = [];
+    let serialNum = 1;
+
+    filteredBills.forEach(bill => {
+      bill.items.forEach((item, itemIndex) => {
+        if (itemIndex === 0) {
+          tableData.push([
+            serialNum++,
+            bill.id,
+            bill.shopName,
+            item.name,
+            `${item.qty} ${item.unit}`,
+            `Rs. ${item.actualRate !== undefined ? item.actualRate : item.rate}`,
+            `Rs. ${item.amount}`
+          ]);
+        } else {
+          tableData.push([
+            '', // Empty S.No
+            '', // Empty Inv ID
+            '', // Empty Shop Name
+            item.name,
+            `${item.qty} ${item.unit}`,
+            `Rs. ${item.actualRate !== undefined ? item.actualRate : item.rate}`,
+            `Rs. ${item.amount}`
+          ]);
+        }
+      });
+      
+      // Add a sub-total row for the bill
+      tableData.push([
+        { 
+          content: `Total for ${bill.shopName} (${bill.totalItems} Items):`, 
+          colSpan: 6, 
+          styles: { halign: 'right', fontStyle: 'bold', fillColor: [245, 245, 245] } 
+        },
+        { 
+          content: `Rs. ${bill.grandTotal.toFixed(2)}`, 
+          styles: { halign: 'right', fontStyle: 'bold', fillColor: [245, 245, 245] } 
+        }
+      ]);
+    });
+
+    autoTable(doc, {
+      startY: 38,
+      head: [['S.No', 'Inv ID', 'Shop Name', 'Item Name', 'Qty', 'Rate', 'Amount']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 91, 170], halign: 'center' },
+      styles: { fontSize: 8, cellPadding: 3, lineColor: [200, 200, 200], lineWidth: 0.1 },
+      columnStyles: {
+        0: { cellWidth: 12, halign: 'center' },
+        1: { cellWidth: 20, halign: 'center' },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 'auto' },
+        4: { cellWidth: 18, halign: 'center' },
+        5: { cellWidth: 20, halign: 'right' },
+        6: { cellWidth: 25, halign: 'right' },
+      }
+    });
+    
+    // Add Grand Total sum at the very bottom
+    let currentY = doc.lastAutoTable.finalY + 15;
+    if (currentY > 270) {
+      doc.addPage();
+      currentY = 20;
+    }
+    const totalSum = filteredBills.reduce((sum, b) => sum + b.grandTotal, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(0, 91, 170); // Pepsi blue
+    doc.text(`GRAND TOTAL FOR REPORT: Rs. ${totalSum.toFixed(2)}`, 14, currentY);
+    
+    doc.save(dateFilter ? `Detailed_Bills_Report_${dateFilter}.pdf` : `Detailed_Bills_Report_All.pdf`);
+  };
 
   const handlePushToCurrent = (id) => {
     unclearBill(id);
@@ -63,6 +238,33 @@ const BillHistory = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: '250px' }}
             />
+          </div>
+          <div className="date-filter" style={{ display: 'flex', alignItems: 'center' }}>
+            <input 
+              type="date" 
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
+            />
+            {dateFilter && (
+              <button 
+                onClick={() => setDateFilter('')} 
+                className="btn btn-secondary" 
+                style={{ marginLeft: '0.5rem', padding: '0.5rem 1rem' }}
+              >
+                Clear Date
+              </button>
+            )}
+            {filteredBills.length > 0 && (
+              <button 
+                onClick={handleBatchDownloadPDF}
+                className="btn btn-primary"
+                style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                <Download size={16} />
+                Download PDF ({filteredBills.length})
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -103,6 +305,14 @@ const BillHistory = () => {
                       >
                         {expandedRow === bill.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         Details
+                      </button>
+                      <button 
+                        className="btn btn-secondary"
+                        onClick={() => handleDownloadSinglePDF(bill)}
+                        title="Download PDF"
+                        style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--pepsi-blue)' }}
+                      >
+                        <Download size={16} />
                       </button>
                       <button 
                         className="btn btn-secondary"
@@ -175,6 +385,7 @@ const BillHistory = () => {
           </tbody>
         </table>
       </div>
+      
     </div>
   );
 };

@@ -237,6 +237,23 @@
     display: block !important;
   }
 
+  .history-header .history-actions, .history-table th:last-child, .history-table td:last-child {
+    display: none !important;
+  }
+
+  .history-page.printing-single .history-header,
+  .history-page.printing-single .history-table-container {
+    display: none !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: inline !important;
+  }
+
   .print-container {
     display: grid !important;
     position: relative !important;
@@ -374,5 +391,11 @@
 
   .print-totals {
     margin-top: auto;
+  }
+}
+
+@media screen {
+  .print-detail-view {
+    display: none !important;
   }
 }
