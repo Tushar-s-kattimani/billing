@@ -241,9 +241,9 @@
     display: grid !important;
     position: relative !important;
     width: 100%;
-    /* A4 roughly fits these gaps nicely */
-    gap: 10mm;
-    padding: 10mm;
+    /* Flexible gap and minimal padding for universal printer support (thermal & standard) */
+    gap: 5mm;
+    padding: 0;
     box-sizing: border-box;
   }
 
@@ -255,8 +255,8 @@
   .print-layout-9 { grid-template-columns: repeat(3, 1fr); }
 
   .print-receipt {
-    border: 2px solid #000;
-    padding: 10mm;
+    border: 1px solid #000;
+    padding: 5px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
