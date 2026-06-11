@@ -11,10 +11,19 @@ const CurrentSavedBills = () => {
   const [billsPerPage, setBillsPerPage] = useState(4);
   const [showLoadSheet, setShowLoadSheet] = useState(false);
 
-  // Filter for ONLY bills that haven't been cleared yet, and apply search
-  const pendingBills = bills.filter(b => 
-    !b.isCleared && b.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [billFilter, setBillFilter] = useState('all');
+
+  // Filter for ONLY bills that haven't been cleared yet, and apply search and size filters
+  const pendingBills = bills.filter(b => {
+    if (b.isCleared) return false;
+    if (!b.id.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    const isBigBill = b.items.length > 15;
+    
+    if (billFilter === 'small' && isBigBill) return false;
+    if (billFilter === 'big' && !isBigBill) return false;
+    
+    return true;
+  });
 
   const handleClear = (id) => {
     clearBill(id);
@@ -96,6 +105,29 @@ const CurrentSavedBills = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+          </div>
+          <div className="filter-tabs" style={{ display: 'flex', backgroundColor: 'white', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+            <button 
+              className={`btn ${billFilter === 'all' ? 'btn-primary' : 'btn-secondary'}`} 
+              onClick={() => setBillFilter('all')}
+              style={{ border: 'none', borderRadius: 0 }}
+            >
+              All Bills
+            </button>
+            <button 
+              className={`btn ${billFilter === 'small' ? 'btn-primary' : 'btn-secondary'}`} 
+              onClick={() => setBillFilter('small')}
+              style={{ border: 'none', borderRadius: 0, borderLeft: '1px solid var(--border-color)', borderRight: '1px solid var(--border-color)' }}
+            >
+              Short Bills (≤ 15 items)
+            </button>
+            <button 
+              className={`btn ${billFilter === 'big' ? 'btn-primary' : 'btn-secondary'}`} 
+              onClick={() => setBillFilter('big')}
+              style={{ border: 'none', borderRadius: 0 }}
+            >
+              Long Bills (&gt; 15 items)
+            </button>
           </div>
           {pendingBills.length > 0 && (
             <div className="print-controls" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', backgroundColor: 'white', padding: '0.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
@@ -270,13 +302,14 @@ const CurrentSavedBills = () => {
         </div>
       )}
 
-      {/* Hidden Print Container */}
-      <div className={`print-container ${showLoadSheet ? 'print-load-sheet-layout' : `print-layout-${billsPerPage}`}`}>
+      {/* Hidden Print Area */}
+      <div className="print-wrapper print-only" style={{ display: 'none' }}>
         {showLoadSheet ? (
-          <div className="print-load-sheet">
-            <h1 style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '20px', textTransform: 'uppercase' }}>
-              Daily Load Sheet
-            </h1>
+          <div className="print-container print-load-sheet-layout">
+            <div className="print-load-sheet">
+              <h1 style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '20px', textTransform: 'uppercase' }}>
+                Daily Load Sheet
+              </h1>
             <p style={{ textAlign: 'center', marginBottom: '20px' }}>Date: {new Date().toLocaleDateString('en-IN')}</p>
             
             {Object.keys(loadSheetProducts).length > 0 && (
@@ -323,9 +356,71 @@ const CurrentSavedBills = () => {
               </table>
             )}
           </div>
-        ) : (
-          pendingBills.map(bill => (
-            <div key={`print-${bill.id}`} className="print-receipt">
+        </div>
+      ) : (
+          (() => {
+            const pages = [];
+            let normalBills = [];
+            let longBills = [];
+
+            if (billsPerPage === 1) {
+              normalBills = pendingBills;
+            } else {
+              const threshold = (billsPerPage === 2 || billsPerPage === 4) ? 15 : 10;
+              pendingBills.forEach(bill => {
+                if (bill.items.length > threshold) {
+                  longBills.push(bill);
+                } else {
+                  normalBills.push(bill);
+                }
+              });
+            }
+
+            // Normal pages chunks
+            for (let i = 0; i < normalBills.length; i += billsPerPage) {
+              pages.push({
+                layout: billsPerPage,
+                bills: normalBills.slice(i, i + billsPerPage)
+              });
+            }
+
+            // Long bills chunks (Using selected layout, but separated to the end)
+            for (let i = 0; i < longBills.length; i += billsPerPage) {
+              pages.push({
+                layout: billsPerPage,
+                bills: longBills.slice(i, i + billsPerPage)
+              });
+            }
+
+            return pages.map((pageObj, pageIndex) => (
+              <div key={`page-${pageIndex}`} style={{ pageBreakAfter: pageIndex === pages.length - 1 ? 'auto' : 'always' }}>
+                <div className={`print-container print-layout-${pageObj.layout}`}>
+                  {pageObj.bills.map(bill => {
+                    let dynamicFontSize = undefined;
+                    let dynamicPadding = undefined;
+                    
+                    if (pageObj.layout === 2 || pageObj.layout === 4) {
+                      if (bill.items.length > 8) {
+                        dynamicFontSize = '10pt';
+                        dynamicPadding = '2px 4px';
+                      } else {
+                        dynamicFontSize = '12pt';
+                        dynamicPadding = '3px 5px';
+                      }
+                    } else if (pageObj.layout === 6 || pageObj.layout === 9) {
+                      dynamicFontSize = '9pt';
+                      dynamicPadding = '1px 2px';
+                    } else if (pageObj.layout === 1) {
+                      dynamicFontSize = '14pt';
+                      dynamicPadding = '5px 8px';
+                    }
+
+                    return (
+                    <div key={`print-${bill.id}`} className="print-receipt" style={{
+                      ...(dynamicFontSize ? { fontSize: dynamicFontSize } : {}),
+                      ...(dynamicPadding ? { '--cell-padding': dynamicPadding } : {}),
+                      ...(pageObj.layout === 1 ? { height: 'auto', minHeight: 'auto', maxHeight: 'none' } : {})
+                    }}>
               <div className="print-header">
                 <h2>SHRI GAJANAN ENTERPRISES GHATAPRABHA</h2>
                 <p>GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040</p>
@@ -363,7 +458,12 @@ const CurrentSavedBills = () => {
                 </div>
               </div>
             </div>
-          ))
+                  );
+                })}
+              </div>
+            </div>
+          ));
+          })()
         )}
       </div>
     </div>

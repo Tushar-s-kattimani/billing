@@ -274,55 +274,73 @@
     color: black !important;
   }
 
-  /* Scale down fonts and allow heights to set automatically based on content */
+  .print-items {
+    flex-grow: 1; /* Stretches the table to fill the empty space in the box, pushing totals to the bottom */
+  }
+
+  /* Enforce equal parts (fixed heights) for grid layouts so they perfectly divide an A4 sheet */
   .print-layout-1 .print-receipt { height: auto; font-size: 16pt; }
-  .print-layout-2 .print-receipt { height: auto; font-size: 14pt; }
+  
+  .print-layout-2 .print-receipt { 
+    height: auto !important; 
+    min-height: 145mm !important; 
+    font-size: 14pt; 
+  }
 
   .print-layout-4 .print-receipt {
-    font-size: 12pt;
-    padding: 4mm;
-    height: auto;
+    font-size: 9pt;
+    padding: 2mm;
+    height: auto !important; 
+    min-height: 145mm !important;
   }
 
   .print-layout-6 .print-receipt {
     font-size: 10pt;
     padding: 3mm;
-    height: auto;
+    height: auto !important;
+    min-height: 95mm !important;
   }
 
   .print-layout-9 .print-receipt {
     font-size: 8.5pt;
     padding: 2mm;
-    height: auto;
+    height: auto !important;
+    min-height: 95mm !important;
   }
 
+  .print-layout-4 .print-header,
   .print-layout-6 .print-header,
   .print-layout-9 .print-header {
     margin-bottom: 5px;
     padding-bottom: 5px;
   }
 
+  .print-layout-4 .print-header h2,
   .print-layout-6 .print-header h2,
   .print-layout-9 .print-header h2 {
     font-size: 1.1em;
     margin-bottom: 2px;
   }
 
+  .print-layout-4 .print-header p,
   .print-layout-6 .print-header p,
   .print-layout-9 .print-header p {
     margin: 1px 0;
   }
 
+  .print-layout-4 .print-items,
   .print-layout-6 .print-items,
   .print-layout-9 .print-items {
     margin-bottom: 5px;
   }
 
+  .print-layout-4 .print-items th,
+  .print-layout-4 .print-items td,
   .print-layout-6 .print-items th, 
   .print-layout-9 .print-items th,
   .print-layout-6 .print-items td,
   .print-layout-9 .print-items td {
-    padding: 2px 4px;
+    padding: var(--cell-padding, 2px 4px);
   }
 
   .print-header {
