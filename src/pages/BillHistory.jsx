@@ -8,7 +8,7 @@ import autoTable from 'jspdf-autotable';
 import { robotoRegular, robotoBold } from '../RobotoFont';
 
 const BillHistory = () => {
-  const { bills, unclearBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
+  const { bills, unclearBill, currentBillItems, setCurrentBillItems, setCurrentShopName, setCurrentBillId } = useAppContext();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('');
@@ -96,6 +96,7 @@ const BillHistory = () => {
     }
     setCurrentBillItems(bill.items);
     setCurrentShopName(bill.shopName || '');
+    setCurrentBillId(bill.id);
     navigate('/');
   };
 

@@ -67,6 +67,10 @@ export const AppProvider = ({ children, user }) => {
     return localStorage.getItem(getStorageKey('currentShopName')) || '';
   });
 
+  const [currentBillId, setCurrentBillId] = useState(() => {
+    return localStorage.getItem(getStorageKey('currentBillId')) || null;
+  });
+
   useEffect(() => {
     localStorage.setItem(getStorageKey('currentBillItems'), JSON.stringify(currentBillItems));
   }, [currentBillItems, userKey]);
@@ -74,6 +78,14 @@ export const AppProvider = ({ children, user }) => {
   useEffect(() => {
     localStorage.setItem(getStorageKey('currentShopName'), currentShopName);
   }, [currentShopName, userKey]);
+
+  useEffect(() => {
+    if (currentBillId) {
+      localStorage.setItem(getStorageKey('currentBillId'), currentBillId);
+    } else {
+      localStorage.removeItem(getStorageKey('currentBillId'));
+    }
+  }, [currentBillId, userKey]);
 
   // Fetch true state from Firebase on mount or when user changes
   useEffect(() => {
@@ -148,6 +160,9 @@ export const AppProvider = ({ children, user }) => {
           if (data.currentShopName !== undefined) {
             setCurrentShopName(data.currentShopName);
           }
+          if (data.currentBillId !== undefined) {
+            setCurrentBillId(data.currentBillId);
+          }
         }
       } catch (err) {
         console.error("Firebase connection error. Falling back to local storage.", err);
@@ -159,6 +174,8 @@ export const AppProvider = ({ children, user }) => {
         setBills(savedBills ? JSON.parse(savedBills) : []);
         const savedDraft = localStorage.getItem(`billing_currentBillItems_${userKey}`);
         if (savedDraft) setCurrentBillItems(JSON.parse(savedDraft));
+        const savedDraftId = localStorage.getItem(`billing_currentBillId_${userKey}`);
+        if (savedDraftId) setCurrentBillId(savedDraftId);
       }
       setLoadedUserKey(userKey);
       setDataLoaded(true);
@@ -184,18 +201,19 @@ export const AppProvider = ({ children, user }) => {
     localStorage.setItem(getStorageKey('history'), JSON.stringify(bills));
   }, [bills, userKey]);
 
-  // Save to Firebase whenever currentBillItems or currentShopName changes
+  // Save to Firebase whenever currentBillItems, currentShopName or currentBillId changes
   useEffect(() => {
     if (dataLoaded && !isFirebaseError && user && loadedUserKey === userKey) {
       setDoc(doc(db, "users", firebaseUserKey, "data", "draft"), { 
         currentBillItems,
-        currentShopName
+        currentShopName,
+        currentBillId: currentBillId || null
       }, { merge: true })
         .catch(err => {
           console.error("Firebase save draft error: ", err);
         });
     }
-  }, [currentBillItems, currentShopName, dataLoaded, isFirebaseError, userKey, loadedUserKey, firebaseUserKey]);
+  }, [currentBillItems, currentShopName, currentBillId, dataLoaded, isFirebaseError, userKey, loadedUserKey, firebaseUserKey]);
 
   const addProduct = (newProduct) => setProducts([...products, newProduct]);
   const deleteProduct = (id) => setProducts(products.filter(p => p.id !== id));
@@ -271,7 +289,8 @@ export const AppProvider = ({ children, user }) => {
       products, addProduct, deleteProduct, editProduct, moveProduct,
       bills, addBill, updateBillStatus, clearBill, unclearBill, clearAllBills,
       currentBillItems, setCurrentBillItems,
-      currentShopName, setCurrentShopName
+      currentShopName, setCurrentShopName,
+      currentBillId, setCurrentBillId
     }}>
       {children}
     </AppContext.Provider>

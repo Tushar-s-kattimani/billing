@@ -11,7 +11,9 @@ const BillingDashboard = () => {
     currentBillItems: billItems, 
     setCurrentBillItems: setBillItems,
     currentShopName: shopName,
-    setCurrentShopName: setShopName
+    setCurrentShopName: setShopName,
+    currentBillId,
+    setCurrentBillId
   } = useAppContext();
 
   const handleAddToBill = (item) => {
@@ -61,7 +63,7 @@ const BillingDashboard = () => {
     if (billItems.length === 0) return;
     
     const newBill = {
-      id: `INV-${Date.now()}`,
+      id: currentBillId || `INV-${Date.now()}`,
       date: new Date().toISOString(),
       shopName: shopName || 'Cash Sale', // Default to Cash Sale if empty
       items: billItems,
@@ -75,6 +77,7 @@ const BillingDashboard = () => {
     addBill(newBill);
     setBillItems([]); // Clear cart
     setShopName(''); // Clear shop name
+    setCurrentBillId(null); // Clear bill ID
   };
 
   return (
