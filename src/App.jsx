@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import BillingDashboard from './components/billing/BillingDashboard';
 import Products from './pages/Products';
@@ -36,7 +36,7 @@ function App() {
 
   return (
     <AppProvider user={user}>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<BillingDashboard />} />
@@ -45,7 +45,7 @@ function App() {
             <Route path="bills" element={<BillHistory />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AppProvider>
   );
 }

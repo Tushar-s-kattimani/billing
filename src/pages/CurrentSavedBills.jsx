@@ -6,7 +6,7 @@ import { useAppContext } from '../context/AppContext';
 
 const CurrentSavedBills = () => {
   const navigate = useNavigate();
-  const { bills, clearBill, clearAllBills, updateBillStatus, deleteBill, setCurrentBillItems, setCurrentShopName } = useAppContext();
+  const { bills, clearBill, clearAllBills, updateBillStatus, setCurrentBillItems, setCurrentShopName } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [billsPerPage, setBillsPerPage] = useState(4);
   const [showLoadSheet, setShowLoadSheet] = useState(false);
@@ -36,10 +36,9 @@ const CurrentSavedBills = () => {
   };
 
   const handleEdit = (bill) => {
-    if (window.confirm("This will move the bill back to the billing screen for editing. Continue?")) {
+    if (window.confirm("This will copy the bill to the billing screen for editing. Continue?")) {
       setCurrentBillItems(bill.items);
       setCurrentShopName(bill.shopName);
-      deleteBill(bill.id);
       navigate('/');
     }
   };

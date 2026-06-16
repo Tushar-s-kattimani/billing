@@ -13,9 +13,6 @@ const Products = () => {
   const [newProduct, setNewProduct] = useState({ name: '', variants: [{ size: '', rate: '' }] });
 
   // Handlers
-  const handleDelete = (id) => {
-    deleteProduct(id);
-  };
 
   const handleEditClick = (product) => {
     setEditingId(product.id);
@@ -132,9 +129,6 @@ const Products = () => {
                     )}
                     <button className="icon-btn" title="Edit" onClick={() => handleEditClick(product)}>
                       <Edit2 size={16} />
-                    </button>
-                    <button className="icon-btn delete" title="Delete" onClick={() => handleDelete(product.id)}>
-                      <Trash2 size={16} />
                     </button>
                   </div>
                 </td>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase';
 
 const AppContext = createContext();
@@ -89,13 +89,55 @@ export const AppProvider = ({ children, user }) => {
           setProducts(saved ? JSON.parse(saved) : initialProducts);
         }
 
-        const billDoc = await getDoc(doc(db, "users", firebaseUserKey, "data", "bills"));
-        if (billDoc.exists() && billDoc.data().items) {
-          setBills(billDoc.data().items);
-        } else {
-          const saved = localStorage.getItem(`billing_history_${userKey}`);
-          setBills(saved ? JSON.parse(saved) : []);
+        // Fetch bills from individual documents in the 'bills' subcollection
+        let fetchedBills = [];
+        try {
+          const billsQuerySnapshot = await getDocs(collection(db, "users", firebaseUserKey, "bills"));
+          billsQuerySnapshot.forEach((doc) => {
+            fetchedBills.push(doc.data());
+          });
+        } catch (err) {
+          console.error("Error fetching bills subcollection", err);
         }
+
+        // Migration from old single document to individual documents
+        const oldBillDoc = await getDoc(doc(db, "users", firebaseUserKey, "data", "bills"));
+        if (oldBillDoc.exists() && oldBillDoc.data().items) {
+          const oldBills = oldBillDoc.data().items;
+          const newBillIds = new Set(fetchedBills.map(b => b.id));
+          const billsToMigrate = oldBills.filter(b => !newBillIds.has(b.id));
+
+          if (billsToMigrate.length > 0) {
+            const batch = writeBatch(db);
+            billsToMigrate.forEach(bill => {
+              const billRef = doc(db, "users", firebaseUserKey, "bills", String(bill.id));
+              batch.set(billRef, bill);
+            });
+            await batch.commit().catch(err => console.error("Migration batch commit failed", err));
+            fetchedBills = [...fetchedBills, ...billsToMigrate];
+          }
+        }
+
+        // Migration from local storage for bills that didn't sync properly previously
+        const saved = localStorage.getItem(`billing_history_${userKey}`);
+        const localBills = saved ? JSON.parse(saved) : [];
+        if (localBills.length > 0) {
+          const newBillIds = new Set(fetchedBills.map(b => b.id));
+          const localBillsToMigrate = localBills.filter(b => !newBillIds.has(b.id));
+
+          if (localBillsToMigrate.length > 0) {
+            const batch = writeBatch(db);
+            localBillsToMigrate.forEach(bill => {
+              const billRef = doc(db, "users", firebaseUserKey, "bills", String(bill.id));
+              batch.set(billRef, bill);
+            });
+            await batch.commit().catch(err => console.error("Local migration batch commit failed", err));
+            fetchedBills = [...fetchedBills, ...localBillsToMigrate];
+          }
+        }
+
+        fetchedBills.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setBills(fetchedBills);
 
         const draftDoc = await getDoc(doc(db, "users", firebaseUserKey, "data", "draft"));
         if (draftDoc.exists()) {
@@ -137,17 +179,10 @@ export const AppProvider = ({ children, user }) => {
     }
   }, [products, dataLoaded, isFirebaseError, userKey, loadedUserKey, firebaseUserKey]);
 
-  // Save to Firebase and LocalStorage whenever bills change
+  // Save to LocalStorage whenever bills change
   useEffect(() => {
     localStorage.setItem(getStorageKey('history'), JSON.stringify(bills));
-    if (dataLoaded && !isFirebaseError && user && loadedUserKey === userKey) {
-      setDoc(doc(db, "users", firebaseUserKey, "data", "bills"), { items: bills })
-        .catch(err => {
-          console.error(err);
-          alert("Firebase save bills error: " + err.message);
-        });
-    }
-  }, [bills, dataLoaded, isFirebaseError, userKey, loadedUserKey, firebaseUserKey]);
+  }, [bills, userKey]);
 
   // Save to Firebase whenever currentBillItems or currentShopName changes
   useEffect(() => {
@@ -180,17 +215,61 @@ export const AppProvider = ({ children, user }) => {
     }
   };
 
-  const addBill = (newBill) => setBills([newBill, ...bills]); // Add newest to the top
-  const updateBillStatus = (id, isPrinted) => setBills(bills.map(b => b.id === id ? { ...b, isPrinted } : b));
-  const clearBill = (id) => setBills(bills.map(b => b.id === id ? { ...b, isCleared: true } : b));
-  const unclearBill = (id) => setBills(bills.map(b => b.id === id ? { ...b, isCleared: false } : b));
-  const clearAllBills = () => setBills(bills.map(b => ({ ...b, isCleared: true })));
-  const deleteBill = (id) => setBills(bills.filter(b => b.id !== id));
+  const addBill = (newBill) => {
+    setBills(prev => {
+      const index = prev.findIndex(b => b.id === newBill.id);
+      if (index >= 0) {
+        const updated = [...prev];
+        updated[index] = newBill;
+        updated.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return updated;
+      }
+      return [newBill, ...prev]; // Add newest to the top
+    });
+    if (user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", firebaseUserKey, "bills", String(newBill.id)), newBill).catch(console.error);
+    }
+  };
+
+  const updateBillStatus = (id, isPrinted) => {
+    setBills(bills.map(b => b.id === id ? { ...b, isPrinted } : b));
+    if (user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", firebaseUserKey, "bills", String(id)), { isPrinted }, { merge: true }).catch(console.error);
+    }
+  };
+
+  const clearBill = (id) => {
+    setBills(bills.map(b => b.id === id ? { ...b, isCleared: true } : b));
+    if (user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", firebaseUserKey, "bills", String(id)), { isCleared: true }, { merge: true }).catch(console.error);
+    }
+  };
+
+  const unclearBill = (id) => {
+    setBills(bills.map(b => b.id === id ? { ...b, isCleared: false } : b));
+    if (user && loadedUserKey === userKey) {
+      setDoc(doc(db, "users", firebaseUserKey, "bills", String(id)), { isCleared: false }, { merge: true }).catch(console.error);
+    }
+  };
+
+  const clearAllBills = () => {
+    setBills(bills.map(b => ({ ...b, isCleared: true })));
+    if (user && loadedUserKey === userKey) {
+      const batch = writeBatch(db);
+      bills.forEach(bill => {
+        if (!bill.isCleared) {
+          const billRef = doc(db, "users", firebaseUserKey, "bills", String(bill.id));
+          batch.set(billRef, { isCleared: true }, { merge: true });
+        }
+      });
+      batch.commit().catch(console.error);
+    }
+  };
 
   return (
     <AppContext.Provider value={{ 
       products, addProduct, deleteProduct, editProduct, moveProduct,
-      bills, addBill, updateBillStatus, clearBill, unclearBill, clearAllBills, deleteBill,
+      bills, addBill, updateBillStatus, clearBill, unclearBill, clearAllBills,
       currentBillItems, setCurrentBillItems,
       currentShopName, setCurrentShopName
     }}>

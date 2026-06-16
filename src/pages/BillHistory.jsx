@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './BillHistory.css';
-import { Search, ListPlus, CheckCircle, ChevronDown, ChevronUp, Trash2, Edit, Printer, Download } from 'lucide-react';
+import { Search, ListPlus, CheckCircle, ChevronDown, ChevronUp, Edit, Printer, Download } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
@@ -8,7 +8,7 @@ import autoTable from 'jspdf-autotable';
 import { robotoRegular, robotoBold } from '../RobotoFont';
 
 const BillHistory = () => {
-  const { bills, unclearBill, deleteBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
+  const { bills, unclearBill, currentBillItems, setCurrentBillItems, setCurrentShopName } = useAppContext();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('');
@@ -88,12 +88,6 @@ const BillHistory = () => {
     else setExpandedRow(id);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to permanently delete this bill from history?")) {
-      deleteBill(id);
-    }
-  };
-
   const handleEdit = (bill) => {
     if (currentBillItems.length > 0) {
       if (!window.confirm("Editing this bill will overwrite your current unsaved draft. Continue?")) {
@@ -102,7 +96,6 @@ const BillHistory = () => {
     }
     setCurrentBillItems(bill.items);
     setCurrentShopName(bill.shopName || '');
-    deleteBill(bill.id);
     navigate('/');
   };
 
@@ -344,15 +337,6 @@ const BillHistory = () => {
                         <ListPlus size={16} />
                         To Queue
                       </button>
-                      <button 
-                        className="btn btn-secondary"
-                        onClick={() => handleDelete(bill.id)}
-                        title="Delete Bill Permanently"
-                        style={{ padding: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#dc2626', backgroundColor: 'transparent', border: '1px solid #fca5a5' }}
-                      >
-                        <Trash2 size={16} />
-                        Clear
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -380,6 +364,16 @@ const BillHistory = () => {
                               </tr>
                             ))}
                           </tbody>
+                          <tfoot>
+                            <tr>
+                              <th colSpan="3" style={{ padding: '0.75rem 1rem', textAlign: 'right', borderTop: '2px solid var(--border-color)', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                Items: {bill.totalItems} ({bill.totalQty} Cases)
+                              </th>
+                              <th style={{ padding: '0.75rem 1rem', textAlign: 'right', borderTop: '2px solid var(--border-color)', fontSize: '1.05rem', color: 'var(--pepsi-blue)' }}>
+                                Grand Total: ₹ {bill.grandTotal.toFixed(2)}
+                              </th>
+                            </tr>
+                          </tfoot>
                         </table>
                       </div>
                     </td>

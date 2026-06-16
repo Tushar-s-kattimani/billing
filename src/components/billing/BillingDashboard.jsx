@@ -61,7 +61,7 @@ const BillingDashboard = () => {
     if (billItems.length === 0) return;
     
     const newBill = {
-      id: `INV-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: `INV-${Date.now()}`,
       date: new Date().toISOString(),
       shopName: shopName || 'Cash Sale', // Default to Cash Sale if empty
       items: billItems,
