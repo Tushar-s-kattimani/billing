@@ -7,6 +7,7 @@ import { useAppContext } from '../../context/AppContext';
 
 const BillingDashboard = () => {
   const { 
+    bills,
     addBill, 
     currentBillItems: billItems, 
     setCurrentBillItems: setBillItems,
@@ -62,9 +63,12 @@ const BillingDashboard = () => {
   const handleSaveBill = (totalItems, totalQty, grandTotal) => {
     if (billItems.length === 0) return;
     
+    const existingBill = currentBillId ? bills.find(b => b.id === currentBillId) : null;
+    const billDate = existingBill ? existingBill.date : new Date().toISOString();
+
     const newBill = {
       id: currentBillId || `INV-${Date.now()}`,
-      date: new Date().toISOString(),
+      date: billDate,
       shopName: shopName || 'Cash Sale', // Default to Cash Sale if empty
       items: billItems,
       totalItems,
