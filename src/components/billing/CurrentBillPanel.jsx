@@ -2,15 +2,24 @@ import React, { useState } from 'react';
 import './CurrentBillPanel.css';
 import { Banknote, Smartphone, CreditCard as CardIcon, Building, Save, Printer, PauseCircle, Share2, Trash2 } from 'lucide-react';
 
-const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate, onUpdateItemQty }) => {
+const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate, onUpdateItemQty, onClearBill }) => {
   const totalItems = items.length;
   const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
   const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
 
   return (
     <div className="bill-panel">
-      <div className="bill-header">
-        <h2 className="bill-title">Current Bill</h2>
+      <div className="bill-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <h2 className="bill-title" style={{margin: 0}}>Current Bill</h2>
+        {items.length > 0 && (
+          <button 
+            className="btn btn-secondary print-hidden" 
+            onClick={onClearBill} 
+            style={{padding: '0.25rem 0.5rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center'}}
+          >
+            <Trash2 size={14} style={{marginRight: '4px'}} /> Clear All
+          </button>
+        )}
       </div>
 
       <div className="bill-table-container">
@@ -66,6 +75,15 @@ const CurrentBillPanel = ({ items, onSaveBill, onRemoveItem, onUpdateItemRate, o
                 </td>
               </tr>
             ))}
+            {items.length > 0 && (
+              <tr className="print-only">
+                <td style={{ borderBottom: '1px solid var(--border-color)', height: '3rem' }}></td>
+                <td style={{ borderBottom: '1px solid var(--border-color)' }}></td>
+                <td style={{ borderBottom: '1px solid var(--border-color)' }}></td>
+                <td style={{ borderBottom: '1px solid var(--border-color)' }}></td>
+                <td></td>
+              </tr>
+            )}
             {items.length === 0 && (
               <tr>
                 <td colSpan="6" style={{textAlign: 'center', padding: '2rem', color: 'var(--text-muted)'}}>

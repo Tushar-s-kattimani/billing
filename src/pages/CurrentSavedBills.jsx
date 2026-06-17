@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './BillHistory.css'; // Reusing the same styles
 import { Search, CheckCircle2, Trash2, Printer, Edit } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { sortBillItems, sortSizes } from '../utils/sortUtils';
 
 const CurrentSavedBills = () => {
   const navigate = useNavigate();
@@ -23,6 +24,11 @@ const CurrentSavedBills = () => {
     if (billFilter === 'big' && !isBigBill) return false;
     
     return true;
+  }).map(b => {
+    return {
+      ...b,
+      items: [...b.items].sort(sortBillItems)
+    };
   });
 
   const handleClear = (id) => {
@@ -74,13 +80,7 @@ const CurrentSavedBills = () => {
       });
     });
     
-    const allSizes = Array.from(sizeSet).sort((a, b) => {
-      const aIsMl = a.toLowerCase().includes('ml');
-      const bIsMl = b.toLowerCase().includes('ml');
-      if (aIsMl && !bIsMl) return -1;
-      if (!aIsMl && bIsMl) return 1;
-      return parseInt(a) - parseInt(b);
-    });
+    const allSizes = Array.from(sizeSet).sort(sortSizes);
     
     return { products, allSizes, grandTotalCases };
   };
@@ -358,112 +358,79 @@ const CurrentSavedBills = () => {
           </div>
         </div>
       ) : (
-          (() => {
-            const pages = [];
-            let normalBills = [];
-            let longBills = [];
-
-            if (billsPerPage === 1) {
-              normalBills = pendingBills;
-            } else {
-              const threshold = (billsPerPage === 2 || billsPerPage === 4) ? 15 : 10;
-              pendingBills.forEach(bill => {
-                if (bill.items.length > threshold) {
-                  longBills.push(bill);
+          <div className={`print-container print-layout-${billsPerPage}`}>
+            {pendingBills.map(bill => {
+              let dynamicFontSize = undefined;
+              let dynamicPadding = undefined;
+              
+              if (billsPerPage === 2 || billsPerPage === 4) {
+                if (bill.items.length > 8) {
+                  dynamicFontSize = '10pt';
+                  dynamicPadding = '2px 4px';
                 } else {
-                  normalBills.push(bill);
+                  dynamicFontSize = '12pt';
+                  dynamicPadding = '3px 5px';
                 }
-              });
-            }
+              } else if (billsPerPage === 6 || billsPerPage === 9) {
+                dynamicFontSize = '9pt';
+                dynamicPadding = '1px 2px';
+              } else if (billsPerPage === 1) {
+                dynamicFontSize = '14pt';
+                dynamicPadding = '5px 8px';
+              }
 
-            // Normal pages chunks
-            for (let i = 0; i < normalBills.length; i += billsPerPage) {
-              pages.push({
-                layout: billsPerPage,
-                bills: normalBills.slice(i, i + billsPerPage)
-              });
-            }
-
-            // Long bills chunks (Using selected layout, but separated to the end)
-            for (let i = 0; i < longBills.length; i += billsPerPage) {
-              pages.push({
-                layout: billsPerPage,
-                bills: longBills.slice(i, i + billsPerPage)
-              });
-            }
-
-            return pages.map((pageObj, pageIndex) => (
-              <div key={`page-${pageIndex}`} style={{ pageBreakAfter: pageIndex === pages.length - 1 ? 'auto' : 'always' }}>
-                <div className={`print-container print-layout-${pageObj.layout}`}>
-                  {pageObj.bills.map(bill => {
-                    let dynamicFontSize = undefined;
-                    let dynamicPadding = undefined;
-                    
-                    if (pageObj.layout === 2 || pageObj.layout === 4) {
-                      if (bill.items.length > 8) {
-                        dynamicFontSize = '10pt';
-                        dynamicPadding = '2px 4px';
-                      } else {
-                        dynamicFontSize = '12pt';
-                        dynamicPadding = '3px 5px';
-                      }
-                    } else if (pageObj.layout === 6 || pageObj.layout === 9) {
-                      dynamicFontSize = '9pt';
-                      dynamicPadding = '1px 2px';
-                    } else if (pageObj.layout === 1) {
-                      dynamicFontSize = '14pt';
-                      dynamicPadding = '5px 8px';
-                    }
-
-                    return (
-                    <div key={`print-${bill.id}`} className="print-receipt" style={{
-                      ...(dynamicFontSize ? { fontSize: dynamicFontSize } : {}),
-                      ...(dynamicPadding ? { '--cell-padding': dynamicPadding } : {}),
-                      ...(pageObj.layout === 1 ? { height: 'auto', minHeight: 'auto', maxHeight: 'none' } : {})
-                    }}>
-              <div className="print-header">
-                <h2>SHRI GAJANAN ENTERPRISES GHATAPRABHA</h2>
-                <p>GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040</p>
-                <div style={{marginTop: '10px', marginBottom: '10px', padding: '4px 0', borderTop: '1px solid #000', borderBottom: '1px solid #000'}}>
-                  <p style={{margin: 0, fontWeight: 'bold', fontSize: '1.2em', textTransform: 'uppercase'}}>To: {bill.shopName}</p>
+              return (
+                <div key={`print-${bill.id}`} className="print-receipt" style={{
+                  ...(dynamicFontSize ? { fontSize: dynamicFontSize } : {}),
+                  ...(dynamicPadding ? { '--cell-padding': dynamicPadding } : {}),
+                  ...(billsPerPage === 1 ? { height: 'auto', minHeight: 'auto', maxHeight: 'none' } : {})
+                }}>
+                  <div className="print-header">
+                    <h2>SHRI GAJANAN ENTERPRISES GHATAPRABHA</h2>
+                    <p>GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040</p>
+                    <div style={{marginTop: '10px', marginBottom: '10px', padding: '4px 0', borderTop: '1px solid #000', borderBottom: '1px solid #000'}}>
+                      <p style={{margin: 0, fontWeight: 'bold', fontSize: '1.2em', textTransform: 'uppercase'}}>To: {bill.shopName}</p>
+                    </div>
+                    <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '5px'}}>
+                      <p>Date: {formatDate(bill.date)}</p>
+                    </div>
+                  </div>
+                  <table className="print-items">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th style={{textAlign: 'right'}}>Amt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bill.items.map((item, idx) => (
+                        <tr key={idx}>
+                          <td style={{fontWeight: 'bold'}}>{item.name}</td>
+                          <td style={{fontWeight: 'bold'}}>{item.qty} {item.unit}</td>
+                          <td style={{fontWeight: 'bold'}}>₹ {item.actualRate !== undefined ? item.actualRate : item.rate}</td>
+                          <td style={{textAlign: 'right', fontWeight: 'bold'}}>₹ {item.amount}</td>
+                        </tr>
+                      ))}
+                      <tr>
+                        <td style={{ borderBottom: '1px solid #000', height: '2.5rem' }}></td>
+                        <td style={{ borderBottom: '1px solid #000' }}></td>
+                        <td style={{ borderBottom: '1px solid #000' }}></td>
+                        <td style={{ borderBottom: '1px solid #000' }}></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div className="print-totals">
+                    <div style={{display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #000', paddingTop: '8px', marginTop: '8px'}}>
+                      <span>Items: {bill.totalItems} ({bill.totalQty})</span>
+                      <strong>Total: ₹ {bill.grandTotal.toFixed(2)}</strong>
+                    </div>
+                  </div>
                 </div>
-                <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '5px'}}>
-                  <p>Date: {formatDate(bill.date)}</p>
-                </div>
-              </div>
-              <table className="print-items">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Rate</th>
-                    <th style={{textAlign: 'right'}}>Amt</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bill.items.map((item, idx) => (
-                    <tr key={idx}>
-                      <td style={{fontWeight: 'bold'}}>{item.name}</td>
-                      <td style={{fontWeight: 'bold'}}>{item.qty} {item.unit}</td>
-                      <td style={{fontWeight: 'bold'}}>₹ {item.actualRate !== undefined ? item.actualRate : item.rate}</td>
-                      <td style={{textAlign: 'right', fontWeight: 'bold'}}>₹ {item.amount}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="print-totals">
-                <div style={{display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #000', paddingTop: '8px', marginTop: '8px'}}>
-                  <span>Items: {bill.totalItems} ({bill.totalQty})</span>
-                  <strong>Total: ₹ {bill.grandTotal.toFixed(2)}</strong>
-                </div>
-              </div>
-            </div>
-                  );
-                })}
-              </div>
-            </div>
-          ));
-          })()
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

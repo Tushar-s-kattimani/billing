@@ -4,6 +4,7 @@ import SelectedShop from './SelectedShop';
 import ProductGrid from './ProductGrid';
 import CurrentBillPanel from './CurrentBillPanel';
 import { useAppContext } from '../../context/AppContext';
+import { sortBillItems } from '../../utils/sortUtils';
 
 const BillingDashboard = () => {
   const { 
@@ -17,6 +18,10 @@ const BillingDashboard = () => {
     setCurrentBillId
   } = useAppContext();
 
+  const sortItems = (items) => {
+    return [...items].sort(sortBillItems);
+  };
+
   const handleAddToBill = (item) => {
     const existingIndex = billItems.findIndex(i => i.name === item.name);
     if (existingIndex >= 0) {
@@ -24,9 +29,9 @@ const BillingDashboard = () => {
       updatedItems[existingIndex].qty += item.qty;
       const currentRate = updatedItems[existingIndex].actualRate !== undefined ? updatedItems[existingIndex].actualRate : updatedItems[existingIndex].rate;
       updatedItems[existingIndex].amount = updatedItems[existingIndex].qty * currentRate;
-      setBillItems(updatedItems);
+      setBillItems(sortItems(updatedItems));
     } else {
-      setBillItems([...billItems, { ...item, actualRate: item.rate, id: Date.now() }]);
+      setBillItems(sortItems([...billItems, { ...item, actualRate: item.rate, id: Date.now() }]));
     }
   };
 
@@ -84,6 +89,14 @@ const BillingDashboard = () => {
     setCurrentBillId(null); // Clear bill ID
   };
 
+  const handleClearBill = () => {
+    if (window.confirm("Are you sure you want to clear all items from the current bill?")) {
+      setBillItems([]);
+      setShopName('');
+      setCurrentBillId(null);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <div className="left-column">
@@ -101,6 +114,7 @@ const BillingDashboard = () => {
           onRemoveItem={(name) => setBillItems(billItems.filter(i => i.name !== name))} 
           onUpdateItemRate={handleUpdateItemRate}
           onUpdateItemQty={handleUpdateItemQty}
+          onClearBill={handleClearBill}
         />
       </div>
     </div>

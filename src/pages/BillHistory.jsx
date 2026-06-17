@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { robotoRegular, robotoBold } from '../RobotoFont';
+import { sortBillItems } from '../utils/sortUtils';
 
 const BillHistory = () => {
   const { bills, unclearBill, currentBillItems, setCurrentBillItems, setCurrentShopName, setCurrentBillId } = useAppContext();
@@ -54,6 +55,8 @@ const BillHistory = () => {
       `₹ ${item.actualRate !== undefined ? item.actualRate : item.rate}`,
       `₹ ${item.amount}`
     ]);
+    
+    tableData.push(['\n\n', '', '', '', '']); // Empty row for manual additions
     
     autoTable(doc, {
       startY: 60,
@@ -117,6 +120,11 @@ const BillHistory = () => {
     }
     
     return matchesSearch && matchesDate;
+  }).map(b => {
+    return {
+      ...b,
+      items: [...b.items].sort(sortBillItems)
+    };
   });
 
   const handleBatchDownloadPDF = () => {
@@ -172,6 +180,8 @@ const BillHistory = () => {
           ]);
         }
       });
+      
+      tableData.push(['\n\n', '', '', '', '', '', '']); // Empty row for manual additions
       
       // Add a sub-total row for the bill
       tableData.push([

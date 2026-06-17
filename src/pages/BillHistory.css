@@ -255,7 +255,9 @@
   }
 
   .print-container {
-    display: grid !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
     position: relative !important;
     width: 100%;
     /* Flexible gap and minimal padding for universal printer support (thermal & standard) */
@@ -265,11 +267,11 @@
   }
 
   /* Grid Layouts based on user selection */
-  .print-layout-1, .print-load-sheet-layout { grid-template-columns: 1fr; }
-  .print-layout-2 { grid-template-columns: 1fr; grid-template-rows: repeat(2, 1fr); }
-  .print-layout-4 { grid-template-columns: repeat(2, 1fr); }
-  .print-layout-6 { grid-template-columns: repeat(2, 1fr); }
-  .print-layout-9 { grid-template-columns: repeat(3, 1fr); }
+  .print-layout-1 .print-receipt, .print-load-sheet-layout .print-receipt { width: 100%; }
+  .print-layout-2 .print-receipt { width: 100%; }
+  .print-layout-4 .print-receipt { width: calc(50% - 2.5mm); }
+  .print-layout-6 .print-receipt { width: calc(50% - 2.5mm); }
+  .print-layout-9 .print-receipt { width: calc(33.333% - 3.33mm); }
 
   .print-receipt {
     border: 1px solid #000;
