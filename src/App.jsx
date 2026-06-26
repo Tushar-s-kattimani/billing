@@ -5,6 +5,7 @@ import BillingDashboard from './components/billing/BillingDashboard';
 import Products from './pages/Products';
 import BillHistory from './pages/BillHistory';
 import CurrentSavedBills from './pages/CurrentSavedBills';
+import Settings from './pages/Settings';
 import Login from './components/Login';
 import { auth, onAuthStateChanged } from './firebase';
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="products" element={<Products />} />
             <Route path="current-bills" element={<CurrentSavedBills />} />
             <Route path="bills" element={<BillHistory />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </HashRouter>

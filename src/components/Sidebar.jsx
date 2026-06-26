@@ -8,7 +8,8 @@ import {
   Clock,
   Users,
   Receipt,
-  LogOut
+  LogOut,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { auth, signOut } from '../firebase';
 
@@ -45,6 +46,11 @@ const Sidebar = () => {
         <NavLink to="/bills" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <Receipt size={20} />
           <span>Bill History</span>
+        </NavLink>
+        
+        <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <SettingsIcon size={20} />
+          <span>Settings</span>
         </NavLink>
       </nav>
 

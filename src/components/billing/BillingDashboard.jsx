@@ -110,6 +110,7 @@ const BillingDashboard = () => {
       <div className="right-column">
         <CurrentBillPanel 
           items={billItems} 
+          shopName={shopName}
           onSaveBill={handleSaveBill} 
           onRemoveItem={(name) => setBillItems(billItems.filter(i => i.name !== name))} 
           onUpdateItemRate={handleUpdateItemRate}

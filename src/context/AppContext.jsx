@@ -43,6 +43,11 @@ export const AppProvider = ({ children, user }) => {
   const [isFirebaseError, setIsFirebaseError] = useState(false);
   const [loadedUserKey, setLoadedUserKey] = useState(null);
 
+  // Bluetooth states
+  const [bluetoothDevice, setBluetoothDevice] = useState(null);
+  const [printerCharacteristic, setPrinterCharacteristic] = useState(null);
+  const isBluetoothConnected = !!(bluetoothDevice && printerCharacteristic);
+
   const userKey = user ? user.email : 'guest';
   const firebaseUserKey = user ? user.uid : 'guest';
   const getStorageKey = (type) => `billing_${type}_${userKey}`;
@@ -290,7 +295,10 @@ export const AppProvider = ({ children, user }) => {
       bills, addBill, updateBillStatus, clearBill, unclearBill, clearAllBills,
       currentBillItems, setCurrentBillItems,
       currentShopName, setCurrentShopName,
-      currentBillId, setCurrentBillId
+      currentBillId, setCurrentBillId,
+      bluetoothDevice, setBluetoothDevice,
+      printerCharacteristic, setPrinterCharacteristic,
+      isBluetoothConnected
     }}>
       {children}
     </AppContext.Provider>
