@@ -9,7 +9,7 @@ const CurrentBillPanel = ({ items, shopName, onSaveBill, onRemoveItem, onUpdateI
   const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
   const grandTotal = items.reduce((sum, item) => sum + item.amount, 0);
 
-  const { isBluetoothConnected, printerCharacteristic } = useAppContext();
+  const { isBluetoothConnected, printerCharacteristic, useRawBT } = useAppContext();
 
   const handlePrint = async () => {
     if (isBluetoothConnected && printerCharacteristic) {
@@ -72,6 +72,55 @@ const CurrentBillPanel = ({ items, shopName, onSaveBill, onRemoveItem, onUpdateI
       } catch (err) {
         console.error('Bluetooth printing failed, falling back to window.print', err);
         alert('Bluetooth print failed. Falling back to normal print. ' + err.message);
+      }
+    } else if (useRawBT) {
+      try {
+        const builder = new ESCPOSBuilder();
+        builder.init();
+        
+        builder.align('center');
+        builder.bold(true).size(true, true).textLine('SHRI GAJANAN ENTERPRISES GHATAPRABHA').size(false, false).bold(false);
+        builder.textLine('GSTIN: 29AHSPK1222F1ZD | Mob: 9448860040');
+        builder.bold(true).textLine('TAX INVOICE').bold(false);
+        builder.feed(1);
+        
+        if (shopName) {
+          builder.align('left');
+          builder.bold(true).text('To: ').bold(false).textLine(shopName);
+          builder.feed(1);
+        }
+
+        builder.align('left');
+        builder.separator('-');
+        builder.itemRow('Item', 'Qty', 'Rate', 'Amount');
+        builder.separator('-');
+
+        items.forEach(item => {
+          const rate = item.actualRate !== undefined ? item.actualRate : item.rate;
+          builder.itemRow(item.name, item.qty.toString(), rate.toString(), item.amount.toString());
+        });
+
+        builder.separator('-');
+        
+        builder.align('right');
+        builder.bold(true).textLine(`Total Items: ${totalItems} (${totalQty} Cases)`).bold(false);
+        builder.size(false, true).bold(true).textLine(`Grand Total: Rs ${grandTotal.toFixed(2)}`).bold(false).size(false, false);
+        
+        builder.feed(1);
+        builder.align('center');
+        builder.textLine('Thank you for your business!');
+        builder.feed(3);
+        builder.cut();
+
+        const data = builder.build();
+        const base64Data = btoa(String.fromCharCode.apply(null, data));
+        
+        // Launch RawBT intent
+        window.location.href = `intent:${base64Data}#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;`;
+        return;
+      } catch (err) {
+        console.error('RawBT printing failed', err);
+        alert('RawBT printing failed. Make sure the RawBT app is installed. Falling back to normal print.');
       }
     }
 

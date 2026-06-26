@@ -5,7 +5,7 @@ import { Bluetooth, Printer } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const Settings = () => {
-  const { bluetoothDevice, setBluetoothDevice, printerCharacteristic, setPrinterCharacteristic } = useAppContext();
+  const { bluetoothDevice, setBluetoothDevice, printerCharacteristic, setPrinterCharacteristic, useRawBT, setUseRawBT } = useAppContext();
   const isBluetoothConnected = !!(bluetoothDevice && printerCharacteristic);
   
   const [paperSize, setPaperSize] = useState('58mm');
@@ -127,6 +127,23 @@ const Settings = () => {
               style={{ width: '18px', height: '18px', cursor: 'pointer' }}
             />
             <label htmlFor="printLogo" style={{ cursor: 'pointer' }}>Include shop name and details at the top</label>
+          </div>
+        </div>
+
+        <div className="settings-group" style={{ marginTop: '20px' }}>
+          <label className="settings-label">Android POS Print Settings</label>
+          <div className="toggle-container" style={{ marginTop: '8px' }}>
+            <input 
+              type="checkbox" 
+              id="useRawBT" 
+              checked={useRawBT} 
+              onChange={(e) => setUseRawBT(e.target.checked)}
+              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+            />
+            <label htmlFor="useRawBT" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
+              <span>Use RawBT App for Direct Printing</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Enable this to instantly bypass the browser print dialog if you have the RawBT app installed on your Android billing machine.</span>
+            </label>
           </div>
         </div>
       </div>

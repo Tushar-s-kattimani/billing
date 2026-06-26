@@ -47,6 +47,9 @@ export const AppProvider = ({ children, user }) => {
   const [bluetoothDevice, setBluetoothDevice] = useState(null);
   const [printerCharacteristic, setPrinterCharacteristic] = useState(null);
   const isBluetoothConnected = !!(bluetoothDevice && printerCharacteristic);
+  
+  // RawBT state
+  const [useRawBT, setUseRawBT] = useState(false);
 
   const userKey = user ? user.email : 'guest';
   const firebaseUserKey = user ? user.uid : 'guest';
@@ -298,7 +301,8 @@ export const AppProvider = ({ children, user }) => {
       currentBillId, setCurrentBillId,
       bluetoothDevice, setBluetoothDevice,
       printerCharacteristic, setPrinterCharacteristic,
-      isBluetoothConnected
+      isBluetoothConnected,
+      useRawBT, setUseRawBT
     }}>
       {children}
     </AppContext.Provider>
