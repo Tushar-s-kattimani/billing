@@ -53,7 +53,7 @@ const Settings = () => {
       }
     } catch (error) {
       console.error(error);
-      alert('Bluetooth connection failed or was cancelled.');
+      alert(`Bluetooth connection failed: ${error.message || 'Cancelled by user.'}`);
     }
   };
 
