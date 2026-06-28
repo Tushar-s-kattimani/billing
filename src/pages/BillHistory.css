@@ -401,3 +401,78 @@
     display: none !important;
   }
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .history-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .history-table-container {
+    overflow-x: auto;
+  }
+
+  .history-table th, .history-table td {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Current Bills / Bill Detail Cards */
+  .bill-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .bill-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .bill-actions button {
+    flex: 1;
+  }
+
+  .bill-items-table {
+    overflow-x: auto;
+  }
+
+  .bill-items-table th, .bill-items-table td {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .filter-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .filter-tabs button {
+    flex: 1 1 auto;
+    width: 100%;
+    border: 1px solid var(--border-color) !important;
+  }
+  
+  .print-controls {
+    flex-wrap: wrap;
+  }
+  
+  .print-controls select, .print-controls button {
+    flex: 1 1 100%;
+  }
+
+  .empty-state {
+    padding: 2rem;
+  }
+}

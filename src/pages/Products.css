@@ -175,3 +175,37 @@
   gap: 1rem;
   margin-top: 2rem;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .data-table-container {
+    overflow-x: auto;
+  }
+
+  .data-table th, .data-table td {
+    padding: 0.75rem 1rem;
+  }
+
+  .modal-content {
+    width: 90%;
+    max-width: 400px;
+    padding: 1.5rem;
+  }
+}

@@ -89,3 +89,30 @@
   align-items: center;
   gap: 0.75rem;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 1rem;
+  }
+  
+  .settings-card {
+    padding: 1.25rem;
+  }
+
+  .settings-select {
+    max-width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* If the bluetooth disconnect button is next to connected text, they should wrap */
+  .settings-card > div[style*="align-items: center"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+}
