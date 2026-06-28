@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
-import { Search, Clock } from 'lucide-react';
+import { Search, Clock, Menu } from 'lucide-react';
 import { auth } from '../firebase';
 
-const Header = () => {
+const Header = ({ toggleSidebar }) => {
   const [currentDateTime, setCurrentDateTime] = useState('');
   const userEmail = auth.currentUser?.email || '';
 
@@ -21,15 +21,19 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="header-search">
-        <Search className="search-icon" />
+      <div className="header-left">
+        <button className="mobile-menu-btn" onClick={toggleSidebar}>
+          <Menu size={24} />
+        </button>
+        <div className="header-search">
+          <Search className="search-icon" />
         <input 
           type="text" 
           placeholder="Search Shop by Name or Mobile Number" 
           className="search-input"
         />
+        </div>
       </div>
-      
       <div className="header-right">
         <div className="datetime">
           <Clock size={16} />

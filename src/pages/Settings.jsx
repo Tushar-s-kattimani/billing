@@ -15,7 +15,12 @@ const Settings = () => {
     try {
       if (navigator.bluetooth) {
         const device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
+          filters: [
+            { services: ['000018f0-0000-1000-8000-00805f9b34fb'] },
+            { services: ['e7810a71-73ae-499d-8c15-faa9aef0c3f2'] },
+            { services: ['0000fee7-0000-1000-8000-00805f9b34fb'] },
+            { services: ['49535343-fe7d-4ae5-8fa9-9fafd205e455'] }
+          ],
           optionalServices: [
             '000018f0-0000-1000-8000-00805f9b34fb',
             'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
@@ -79,10 +84,15 @@ const Settings = () => {
           <p className="settings-label" style={{ marginBottom: '16px' }}>Connect to a Thermal Printer via Bluetooth</p>
           
           {!isBluetoothConnected ? (
-            <button className="btn btn-primary" onClick={handleConnectBluetooth} style={{ display: 'flex', gap: '8px' }}>
-              <Bluetooth size={18} />
-              Pair Bluetooth Printer
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button className="btn btn-primary" onClick={handleConnectBluetooth} style={{ display: 'flex', gap: '8px', alignSelf: 'flex-start' }}>
+                <Bluetooth size={18} />
+                Pair Bluetooth Printer
+              </button>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                Tip: If your printer shows up as "Unknown Device", try pairing it in your device's Bluetooth settings first, or just select the "Unknown Device" to connect.
+              </span>
+            </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <button className="btn btn-danger" onClick={handleDisconnect}>

@@ -13,13 +13,13 @@ import {
 } from 'lucide-react';
 import { auth, signOut } from '../firebase';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, closeSidebar }) => {
   const handleLogout = () => {
     signOut(auth);
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           <div className="logo-icon">P</div>
@@ -28,27 +28,27 @@ const Sidebar = () => {
       </div>
       
       <nav className="sidebar-nav">
-        <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/" onClick={closeSidebar} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <LayoutDashboard size={20} />
           <span>New Billing</span>
         </NavLink>
         
-        <NavLink to="/products" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/products" onClick={closeSidebar} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <Package size={20} />
           <span>Products</span>
         </NavLink>
         
-        <NavLink to="/current-bills" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/current-bills" onClick={closeSidebar} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <Clock size={20} />
           <span>Current Bills</span>
         </NavLink>
         
-        <NavLink to="/bills" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/bills" onClick={closeSidebar} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <Receipt size={20} />
           <span>Bill History</span>
         </NavLink>
         
-        <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/settings" onClick={closeSidebar} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <SettingsIcon size={20} />
           <span>Settings</span>
         </NavLink>
